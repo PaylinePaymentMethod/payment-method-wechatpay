@@ -206,38 +206,38 @@ public class MockUtils {
                 .build();
     }
     public String aHMACSHA256SignedXml(){
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                "<xml>\n" +
-                "    <return_code>SUCCESS</return_code>\n" +
-                "    <return_msg>returnMessage</return_msg>\n" +
-                "    <result_code>SUCCESS</result_code>\n" +
-                "    <err_code>errorCode</err_code>\n" +
-                "    <err_code_des>errorCodeDescription</err_code_des>\n" +
-                "    <appid>appId</appid>\n" +
-                "    <mch_id>merchantId</mch_id>\n" +
-                "    <sub_appid>subAppId</sub_appid>\n" +
-                "    <sub_mch_id>subMerchantId</sub_mch_id>\n" +
-                "    <nonce_str>nonceStr</nonce_str>\n" +
-                "    <sign_type>HMAC-SHA256</sign_type>\n" +
-                "    <sign>413437B51D1A196D92B015946FF20B3D77D48A81A55559CAE9AE029B54F61CAB</sign>\n" +
-                "</xml>\n";
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" +
+                "<xml>\r\n" +
+                "    <return_code>SUCCESS</return_code>\r\n" +
+                "    <return_msg>returnMessage</return_msg>\r\n" +
+                "    <result_code>SUCCESS</result_code>\r\n" +
+                "    <err_code>errorCode</err_code>\r\n" +
+                "    <err_code_des>errorCodeDescription</err_code_des>\r\n" +
+                "    <appid>appId</appid>\r\n" +
+                "    <mch_id>merchantId</mch_id>\r\n" +
+                "    <sub_appid>subAppId</sub_appid>\r\n" +
+                "    <sub_mch_id>subMerchantId</sub_mch_id>\r\n" +
+                "    <nonce_str>nonceStr</nonce_str>\r\n" +
+                "    <sign_type>HMAC-SHA256</sign_type>\r\n" +
+                "    <sign>413437B51D1A196D92B015946FF20B3D77D48A81A55559CAE9AE029B54F61CAB</sign>\r\n" +
+                "</xml>\r\n";
     }
     public String aMD5SignedXml(){
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                "<xml>\n" +
-                "    <return_code>SUCCESS</return_code>\n" +
-                "    <return_msg>returnMessage</return_msg>\n" +
-                "    <result_code>SUCCESS</result_code>\n" +
-                "    <err_code>errorCode</err_code>\n" +
-                "    <err_code_des>errorCodeDescription</err_code_des>\n" +
-                "    <appid>appId</appid>\n" +
-                "    <mch_id>merchantId</mch_id>\n" +
-                "    <sub_appid>subAppId</sub_appid>\n" +
-                "    <sub_mch_id>subMerchantId</sub_mch_id>\n" +
-                "    <nonce_str>nonceStr</nonce_str>\n" +
-                "    <sign_type>MD5</sign_type>\n" +
-                "    <sign>C4C4063BA822FC13EA0778CC700849A8</sign>\n" +
-                "</xml>\n";
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" +
+                "<xml>\r\n" +
+                "    <return_code>SUCCESS</return_code>\r\n" +
+                "    <return_msg>returnMessage</return_msg>\r\n" +
+                "    <result_code>SUCCESS</result_code>\r\n" +
+                "    <err_code>errorCode</err_code>\r\n" +
+                "    <err_code_des>errorCodeDescription</err_code_des>\r\n" +
+                "    <appid>appId</appid>\r\n" +
+                "    <mch_id>merchantId</mch_id>\r\n" +
+                "    <sub_appid>subAppId</sub_appid>\r\n" +
+                "    <sub_mch_id>subMerchantId</sub_mch_id>\r\n" +
+                "    <nonce_str>nonceStr</nonce_str>\r\n" +
+                "    <sign_type>MD5</sign_type>\r\n" +
+                "    <sign>C4C4063BA822FC13EA0778CC700849A8</sign>\r\n" +
+                "</xml>\r\n";
     }
     public String aQueryRefundResponseXml(){
         return "<xml>\n" +

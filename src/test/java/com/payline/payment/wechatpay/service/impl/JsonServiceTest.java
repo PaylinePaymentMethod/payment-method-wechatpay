@@ -39,6 +39,13 @@ class JsonServiceTest {
         DownloadTransactionHistoryRequest downloadTransactionHistoryRequest = jsonService.fromJson(expectedJson, DownloadTransactionHistoryRequest.class);
         Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getBillDate(), downloadTransactionHistoryRequest.getBillDate());
         Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getBillType(), downloadTransactionHistoryRequest.getBillType());
+        Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getAppId(), downloadTransactionHistoryRequest.getAppId());
+        Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getMerchantId(), downloadTransactionHistoryRequest.getMerchantId());
+        Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getNonceStr(), downloadTransactionHistoryRequest.getNonceStr());
+        Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getSignType(), downloadTransactionHistoryRequest.getSignType());
+        Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getSign(), downloadTransactionHistoryRequest.getSign());
+        Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getAppId(), downloadTransactionHistoryRequest.getAppId());
+        Assertions.assertEquals(expectedDownloadTransactionHistoryRequest.getSubMerchantId(), downloadTransactionHistoryRequest.getSubMerchantId());
     }
 
 

@@ -71,6 +71,7 @@ class HttpClientTest {
 
         // then: the client finally gets the response
         assertNotNull(stringResponse);
+        assertEquals(200, stringResponse.getStatusCode());
     }
     /**------------------------------------------------------------------------------------------------------------------*/
     @Test

@@ -39,10 +39,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         List<AbstractParameter> parameters = new ArrayList<>();
 
         // merchant id
-        parameters.add(newInputParameter(ContractConfigurationKeys.MERCHANT_ID, true, locale));
+        parameters.add(buildInputParameter(ContractConfigurationKeys.MERCHANT_ID, true, locale));
 
         // sub merchant id
-        parameters.add(newInputParameter(ContractConfigurationKeys.SUB_MERCHANT_ID, true, locale));
+        parameters.add(buildInputParameter(ContractConfigurationKeys.SUB_MERCHANT_ID, true, locale));
 
         return parameters;
     }
@@ -64,28 +64,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 }
             }
 
-            if (errors.size() == 0) {
-                // call for a getCheckoutSession with a bad checkoutSession id
-                RequestConfiguration configuration = RequestConfigurationService.getInstance().build(contractParametersCheckRequest);
-                // call WechatPay API
-                DownloadTransactionHistoryRequest downloadTransactionHistoryRequest = DownloadTransactionHistoryRequest.builder()
-                        .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                        .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
-                        .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
-                        .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
-                        .nonceStr(PluginUtils.generateRandomString(32))
-                        .signType(SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE)).getType())
-                        .billDate(PluginUtils.createDate())
-                        .billType("ALL")
-                        .build();
-
-                Response response = httpService.downloadTransactionHistory(configuration, downloadTransactionHistoryRequest);
-                // verify Response
-                Code code = response.getResultCode();
-                String errorCode = response.getErrorCode();
-
-                if (code.equals(Code.FAIL) && !errorCode.equals("20002")) {
-                    errors.put(GENERIC_ERROR, response.getReturnMessage());
+            if (errors.isEmpty()) {
+                final String errorMessage = checkWechatPayParameters(contractParametersCheckRequest);
+                if (!PluginUtils.isEmpty(errorMessage)) {
+                    errors.put(GENERIC_ERROR, errorMessage);
                 }
             }
         } catch (PluginException e) {
@@ -120,13 +102,41 @@ public class ConfigurationServiceImpl implements ConfigurationService {
      * @param locale   The current locale
      * @return The new input parameter
      */
-    private InputParameter newInputParameter(String key, boolean required, Locale locale) {
+    private InputParameter buildInputParameter(String key, boolean required, Locale locale) {
         InputParameter inputParameter = new InputParameter();
         inputParameter.setKey(key);
         inputParameter.setLabel(i18n.getMessage(I18N_CONTRACT_PREFIX + key + ".label", locale));
         inputParameter.setDescription(i18n.getMessage(I18N_CONTRACT_PREFIX + key + ".description", locale));
         inputParameter.setRequired(required);
         return inputParameter;
+    }
+
+    private String checkWechatPayParameters(final ContractParametersCheckRequest contractParametersCheckRequest) {
+        final String errorMessage;
+        // call for a getCheckoutSession with a bad checkoutSession id
+        final RequestConfiguration configuration = RequestConfigurationService.getInstance().build(contractParametersCheckRequest);
+        // call WechatPay API
+        final DownloadTransactionHistoryRequest downloadTransactionHistoryRequest = DownloadTransactionHistoryRequest.builder()
+                .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
+                .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
+                .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
+                .nonceStr(PluginUtils.generateRandomString(32))
+                .signType(SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE)).getType())
+                .billDate(PluginUtils.createDate())
+                .billType("ALL")
+                .build();
+
+        final Response response = httpService.downloadTransactionHistory(configuration, downloadTransactionHistoryRequest);
+        // verify Response
+        final Code code = response.getResultCode();
+        final String errorCode = response.getErrorCode();
+        if (code.equals(Code.FAIL) && !errorCode.equals("20002")) {
+            errorMessage = response.getReturnMessage();
+        } else {
+            errorMessage = null;
+        }
+        return errorMessage;
     }
 
 }

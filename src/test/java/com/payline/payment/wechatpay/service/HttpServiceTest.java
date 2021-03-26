@@ -70,7 +70,12 @@ class HttpServiceTest {
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
-        StringResponse sr = new StringResponse(200, null, "a content", null);
+        StringResponse sr = StringResponse.builder()
+                .statusCode(200)
+                .headers(null)
+                .content("a content")
+                .statusMessage(null)
+                .build();
         Mockito.doReturn(sr).when(client).post(any(), any(), any());
 
         UnifiedOrderResponse unifiedOrderResponse = UnifiedOrderResponse.builder()
@@ -116,7 +121,12 @@ class HttpServiceTest {
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
-        StringResponse sr = new StringResponse(200, null, "a content", null);
+        StringResponse sr = StringResponse.builder()
+                .statusCode(200)
+                .headers(null)
+                .content("a content")
+                .statusMessage(null)
+                .build();
         Mockito.doReturn(sr).when(client).post(any(), any(), any());
 
         QueryOrderResponse queryOrderResponse = QueryOrderResponse.builder()
@@ -163,7 +173,12 @@ class HttpServiceTest {
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
-        StringResponse sr = new StringResponse(200, null, "a content", null);
+        StringResponse sr = StringResponse.builder()
+                .statusCode(200)
+                .headers(null)
+                .content("a content")
+                .statusMessage(null)
+                .build();
         Mockito.doReturn(sr).when(client).post(any(), any(), any());
 
         SubmitRefundResponse submitRefundResponse = SubmitRefundResponse.builder()
@@ -210,7 +225,12 @@ class HttpServiceTest {
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
-        StringResponse sr = new StringResponse(200, null, "a content", null);
+        StringResponse sr = StringResponse.builder()
+                .statusCode(200)
+                .headers(null)
+                .content("a content")
+                .statusMessage(null)
+                .build();
         Mockito.doReturn(sr).when(client).post(any(), any(), any());
 
         QueryRefundResponse queryRefundResponse = QueryRefundResponse.builder()
@@ -256,7 +276,12 @@ class HttpServiceTest {
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
-        StringResponse sr = new StringResponse(200, null, "a content", null);
+        StringResponse sr = StringResponse.builder()
+                .statusCode(200)
+                .headers(null)
+                .content("a content")
+                .statusMessage(null)
+                .build();
         Mockito.doReturn(sr).when(client).post(any(), any(), any());
 
         Response weChatPayResponse = UnifiedOrderResponse.builder()

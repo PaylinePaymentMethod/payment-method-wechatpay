@@ -73,7 +73,7 @@ class PaymentWithRedirectionServiceImplTest {
                 .withStatusCode("a status code")
                 .withTransactionDetails(new EmptyTransactionDetails())
                 .build();
-        Mockito.doReturn(paymentResponseSuccess).when(service).getRefundStatus(any(), any());
+        Mockito.doReturn(paymentResponseSuccess).when(service).fetchRefundStatus(any(), any());
 
 
         // call method
@@ -85,7 +85,7 @@ class PaymentWithRedirectionServiceImplTest {
         // assertions
         assertEquals(paymentResponseSuccess, paymentResponse);
 
-        Mockito.verify(service, Mockito.atLeastOnce()).getRefundStatus(any(), any());
+        Mockito.verify(service, Mockito.atLeastOnce()).fetchRefundStatus(any(), any());
     }
 
     @Test
@@ -213,7 +213,7 @@ class PaymentWithRedirectionServiceImplTest {
 
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
         TransactionStatusRequest transactionStatusRequest = MockUtils.aPaylineTransactionStatusRequestBuilder().build();
-        PaymentResponse response = service.getRefundStatus(transactionStatusRequest, configuration);
+        PaymentResponse response = service.fetchRefundStatus(transactionStatusRequest, configuration);
 
         Assertions.assertEquals(PaymentResponseSuccess.class, response.getClass());
         Assertions.assertEquals(TRANSACTION_ID, ((PaymentResponseSuccess) response).getPartnerTransactionId());
@@ -237,7 +237,7 @@ class PaymentWithRedirectionServiceImplTest {
 
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
         TransactionStatusRequest transactionStatusRequest = MockUtils.aPaylineTransactionStatusRequestBuilder().build();
-        PaymentResponse response = service.getRefundStatus(transactionStatusRequest, configuration);
+        PaymentResponse response = service.fetchRefundStatus(transactionStatusRequest, configuration);
 
         Assertions.assertEquals(PaymentResponseSuccess.class, response.getClass());
         Assertions.assertEquals(TRANSACTION_ID, ((PaymentResponseSuccess) response).getPartnerTransactionId());
@@ -261,7 +261,7 @@ class PaymentWithRedirectionServiceImplTest {
 
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
         TransactionStatusRequest transactionStatusRequest = MockUtils.aPaylineTransactionStatusRequestBuilder().build();
-        PaymentResponse response = service.getRefundStatus(transactionStatusRequest, configuration);
+        PaymentResponse response = service.fetchRefundStatus(transactionStatusRequest, configuration);
 
         Assertions.assertEquals(PaymentResponseFailure.class, response.getClass());
         Assertions.assertEquals(TRANSACTION_ID, ((PaymentResponseFailure) response).getPartnerTransactionId());

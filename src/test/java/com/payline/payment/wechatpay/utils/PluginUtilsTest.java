@@ -52,12 +52,6 @@ class PluginUtilsTest {
         Assertions.assertEquals("1.00", PluginUtils.createStringAmount(new Amount(int4, Currency.getInstance("EUR"))));
         Assertions.assertEquals("10.00", PluginUtils.createStringAmount(new Amount(int5, Currency.getInstance("EUR"))));
     }
-    @Test
-    void createStringAmountToShow() {
-        String amountToShow = PluginUtils.createStringAmountToShow(MockUtils.aPaylineAmount());
-        Assertions.assertEquals("0.10€", amountToShow);
-    }
-
 
     @Test
     void runtimeErrorCode(){
