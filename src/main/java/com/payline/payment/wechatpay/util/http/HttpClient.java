@@ -3,6 +3,7 @@ package com.payline.payment.wechatpay.util.http;
 
 import com.payline.payment.wechatpay.bean.configuration.RequestConfiguration;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.StringResponseService;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
 import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.payment.wechatpay.util.properties.ConfigProperties;
@@ -11,7 +12,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.http.Header;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.config.RegistryBuilder;
@@ -26,7 +26,10 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -48,6 +51,8 @@ public class HttpClient {
     private int retries;
 
     private org.apache.http.client.HttpClient client;
+
+    private StringResponseService stringResponseService = StringResponseService.getInstance();
 
     // --- Singleton Holder pattern + initialization BEGIN
 
@@ -96,8 +101,6 @@ public class HttpClient {
 
     /**
      * Initialize the instance.
-     *
-     * @param tokenEndpointUrl the full URL of the endpoint that delivers access tokens
      */
     public void init(RequestConfiguration configuration) {
         if (this.initialized.compareAndSet(false, true)) {
@@ -197,7 +200,7 @@ public class HttpClient {
         while (strResponse == null && attempts <= this.retries) {
             log.info("Start call to partner API [{} {}] (attempt {})", httpRequest.getMethod(), httpRequest.getURI(), attempts);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) this.client.execute(httpRequest)) {
-                strResponse = StringResponse.fromHttpResponse(httpResponse);
+                strResponse = stringResponseService.fromHttpResponse(httpResponse);
             } catch (IOException e) {
                 log.error("An error occurred during the HTTP call :", e);
                 strResponse = null;
@@ -211,21 +214,6 @@ public class HttpClient {
         }
         log.info("APIResponseError obtained from partner API [{} {}]", strResponse.getStatusCode(), strResponse.getStatusMessage());
         return strResponse;
-    }
-
-    /**
-     * Manage Get API call
-     *
-     * @param uri     the url to call
-     * @param headers header(s) of the request
-     * @return
-     */
-    public StringResponse get(URI uri, Header[] headers) {
-        final HttpGet httpGet = new HttpGet(uri);
-        httpGet.setHeaders(headers);
-
-        // Execute request
-        return this.execute(httpGet);
     }
 
     /**

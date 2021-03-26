@@ -5,8 +5,6 @@ import com.payline.payment.wechatpay.service.QRCodeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.awt.image.BufferedImage;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class QRCodeServiceTest {
@@ -14,15 +12,15 @@ class QRCodeServiceTest {
 
     @Test
     void generateMatrixOK() {
-        BufferedImage image = qrCodeService.generateMatrix("test", 300);
+        final byte[] image = qrCodeService.generateImage("test", 300);
         Assertions.assertNotNull(image);
     }
     @Test
     void generateMatrixKO_NullData() {
-        assertThrows(PluginException.class, () -> qrCodeService.generateMatrix(null, 300));
+        assertThrows(PluginException.class, () -> qrCodeService.generateImage(null, 300));
     }
     @Test
     void generateMatrixKO_EmptyData() {
-        assertThrows(PluginException.class, () -> qrCodeService.generateMatrix("test", -1));
+        assertThrows(PluginException.class, () -> qrCodeService.generateImage("test", -1));
     }
 }

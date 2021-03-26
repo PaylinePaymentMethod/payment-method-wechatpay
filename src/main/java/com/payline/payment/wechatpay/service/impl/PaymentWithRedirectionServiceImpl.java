@@ -26,16 +26,13 @@ import com.payline.pmapi.bean.payment.response.impl.PaymentResponseSuccess;
 import com.payline.pmapi.service.PaymentWithRedirectionService;
 import lombok.extern.log4j.Log4j2;
 
-import java.sql.Ref;
-
 @Log4j2
 public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirectionService {
     HttpService httpService = HttpService.getInstance();
 
     @Override
     public PaymentResponse finalizeRedirectionPayment(RedirectionPaymentRequest redirectionPaymentRequest) {
-        // todo on peut return null ici?
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -46,14 +43,14 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
             // get the scenario
             String partnerTransactionId = transactionStatusRequest.getTransactionId();
-            if (partnerTransactionId.startsWith("REFUND")){
+            if (partnerTransactionId.startsWith("REFUND")) {
                 // refund scenario
                 log.info("getting refund status");
-                return getRefundStatus(transactionStatusRequest, configuration);
-            }else{
+                paymentResponse = fetchRefundStatus(transactionStatusRequest, configuration);
+            } else {
                 // payment scenario
                 log.info("getting payment status");
-                return getPaymentStatus(transactionStatusRequest, configuration);
+                paymentResponse = getPaymentStatus(transactionStatusRequest, configuration);
             }
         } catch (PluginException e) {
             log.info("a PluginException occurred", e);
@@ -72,7 +69,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
     }
 
 
-    public PaymentResponse getRefundStatus(TransactionStatusRequest request, RequestConfiguration configuration){
+    protected PaymentResponse fetchRefundStatus(TransactionStatusRequest request, RequestConfiguration configuration){
         PaymentResponse paymentResponse;
         String refundId = request.getTransactionId().replace("REFUND", "");
 

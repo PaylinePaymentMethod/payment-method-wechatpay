@@ -92,7 +92,7 @@ public class SignatureUtil {
         StringBuilder sb = new StringBuilder(
                 data.entrySet().stream()
                         .filter(e -> !e.getKey().equals(FIELD_SIGN))    // remove signature entry
-                        .filter(e -> e.getValue().trim().length() > 0)  // remove empty entries
+                        .filter(e -> !PluginUtils.isEmpty(e.getValue()))  // remove empty entries
                         .sorted(Map.Entry.comparingByKey())             // sort entry by alphabetical keys
                         .map(e -> e.getKey() + "=" + e.getValue().trim())// create URL encoded String with remaining entries
                         .collect(Collectors.joining("&"))

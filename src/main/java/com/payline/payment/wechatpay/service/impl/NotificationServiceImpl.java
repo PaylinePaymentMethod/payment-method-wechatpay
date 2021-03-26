@@ -33,10 +33,12 @@ import java.util.Map;
 
 @Log4j2
 public class NotificationServiceImpl implements NotificationService {
-    Converter converter = Converter.getInstance();
-    XMLService xmlService = XMLService.getInstance();
-    HttpService httpService = HttpService.getInstance();
-    SignatureUtil signatureUtil = SignatureUtil.getInstance();
+    private Converter converter = Converter.getInstance();
+    private XMLService xmlService = XMLService.getInstance();
+    private HttpService httpService = HttpService.getInstance();
+    private SignatureUtil signatureUtil = SignatureUtil.getInstance();
+
+    private static final String HTTP_BODY = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
 
     @Override
     public NotificationResponse parse(NotificationRequest notificationRequest) {
@@ -46,7 +48,6 @@ public class NotificationServiceImpl implements NotificationService {
         String partnerTransactionId = "UNKNOWN";
 
         try {
-
             // prepare data
             RequestConfiguration configuration = RequestConfigurationService.getInstance().build(notificationRequest);
 
@@ -55,13 +56,7 @@ public class NotificationServiceImpl implements NotificationService {
 
             Map<String, String> mNotificationMessage = xmlService.xmlToMap(notificationMessage);
 
-            // verify Signature
-            String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
-            SignType signType = SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE));
-            if (!signatureUtil.isSignatureValid(mNotificationMessage, key, signType.getType())) {
-                log.error("Invalid sign value in XML: {}", notificationMessage);
-                throw new PluginException("Invalid signature", FailureCause.INVALID_DATA);
-            }
+            checkSignature(configuration, notificationMessage, mNotificationMessage);
 
             NotificationMessage message = converter.mapToObject(mNotificationMessage, NotificationMessage.class);
             String transactionId = message.getTransactionId();
@@ -101,7 +96,6 @@ public class NotificationServiceImpl implements NotificationService {
                         .withTransactionDetails(buyerPaymentId)
                         .build();
             }
-
         } catch (PluginException e) {
             log.info("a PluginException occurred", e);
             paymentResponse = e.toPaymentResponseFailureBuilder()
@@ -118,7 +112,6 @@ public class NotificationServiceImpl implements NotificationService {
                     .build();
         }
 
-        String httpBody = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
         TransactionCorrelationId correlationId = TransactionCorrelationId.TransactionCorrelationIdBuilder
                 .aCorrelationIdBuilder()
                 .withType(TransactionCorrelationId.CorrelationIdType.PARTNER_TRANSACTION_ID)
@@ -128,12 +121,22 @@ public class NotificationServiceImpl implements NotificationService {
         notificationResponse = PaymentResponseByNotificationResponse.PaymentResponseByNotificationResponseBuilder
                 .aPaymentResponseByNotificationResponseBuilder()
                 .withPaymentResponse(paymentResponse)
-                .withHttpBody(httpBody)
+                .withHttpBody(HTTP_BODY)
                 .withHttpStatus(200)
                 .withTransactionCorrelationId(correlationId)
                 .build();
 
         return notificationResponse;
+    }
+
+    private void checkSignature(final RequestConfiguration configuration, final String notificationMessage, final Map<String, String> mNotificationMessage) {
+        // verify Signature
+        String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
+        SignType signType = SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE));
+        if (!signatureUtil.isSignatureValid(mNotificationMessage, key, signType.getType())) {
+            log.error("Invalid sign value in XML: {}", notificationMessage);
+            throw new PluginException("Invalid signature", FailureCause.INVALID_DATA);
+        }
     }
 
     @Override
