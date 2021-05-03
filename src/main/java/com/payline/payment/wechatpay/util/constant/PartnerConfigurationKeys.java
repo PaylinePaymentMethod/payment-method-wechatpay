@@ -17,4 +17,5 @@ public class PartnerConfigurationKeys {
     public static final String SUB_APPID = "subAppId";
     public static final String SIGN_TYPE = "signType";
     public static final String DEVICE_INFO = "device";
+    public static final String TERMINAL_NUMBER = "TERMINAL_NUMBER";
 }
