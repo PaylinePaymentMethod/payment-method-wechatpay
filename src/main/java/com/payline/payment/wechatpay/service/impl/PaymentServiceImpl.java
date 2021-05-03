@@ -65,7 +65,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private UnifiedOrderRequest buildUnifiedOrderRequest(final PaymentRequest paymentRequest, final RequestConfiguration configuration) {
-        PartnerTransactionIdService partnerTransactionIdService = PartnerTransactionIdService.getInstance();
         return UnifiedOrderRequest.builder()
                 .body(paymentRequest.getSoftDescriptor())
                 .outTradeNo(partnerTransactionIdService.retrievePartnerTransactionId(paymentRequest))
