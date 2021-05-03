@@ -26,6 +26,8 @@ public class PaymentServiceImpl implements PaymentService {
     private RequestConfigurationService requestConfigurationService = RequestConfigurationService.getInstance();
     private HttpService httpService = HttpService.getInstance();
     private QRCodeService qrCodeService = QRCodeService.getInstance();
+    private PartnerTransactionIdService partnerTransactionIdService = PartnerTransactionIdService.getInstance();
+
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
