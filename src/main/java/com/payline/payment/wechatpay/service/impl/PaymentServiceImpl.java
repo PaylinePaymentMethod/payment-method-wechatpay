@@ -7,6 +7,7 @@ import com.payline.payment.wechatpay.bean.request.UnifiedOrderRequest;
 import com.payline.payment.wechatpay.bean.response.UnifiedOrderResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
 import com.payline.payment.wechatpay.service.HttpService;
+import com.payline.payment.wechatpay.service.PartnerTransactionIdService;
 import com.payline.payment.wechatpay.service.QRCodeService;
 import com.payline.payment.wechatpay.service.RequestConfigurationService;
 import com.payline.payment.wechatpay.util.PluginUtils;
@@ -25,6 +26,8 @@ public class PaymentServiceImpl implements PaymentService {
     private RequestConfigurationService requestConfigurationService = RequestConfigurationService.getInstance();
     private HttpService httpService = HttpService.getInstance();
     private QRCodeService qrCodeService = QRCodeService.getInstance();
+    private PartnerTransactionIdService partnerTransactionIdService = PartnerTransactionIdService.getInstance();
+
 
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
@@ -64,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
     private UnifiedOrderRequest buildUnifiedOrderRequest(final PaymentRequest paymentRequest, final RequestConfiguration configuration) {
         return UnifiedOrderRequest.builder()
                 .body(paymentRequest.getSoftDescriptor())
-                .outTradeNo(paymentRequest.getTransactionId())
+                .outTradeNo(partnerTransactionIdService.retrievePartnerTransactionId(paymentRequest))
                 .deviceInfo(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.DEVICE_INFO))
                 .feeType(paymentRequest.getAmount().getCurrency().getCurrencyCode())
                 .totalFee(paymentRequest.getAmount().getAmountInSmallestUnit().toString())

@@ -5,6 +5,7 @@ import com.payline.payment.wechatpay.bean.nested.Code;
 import com.payline.payment.wechatpay.bean.nested.SignType;
 import com.payline.payment.wechatpay.bean.request.DownloadTransactionHistoryRequest;
 import com.payline.payment.wechatpay.bean.response.Response;
+import com.payline.payment.wechatpay.enumeration.PartnerTransactionIdOptions;
 import com.payline.payment.wechatpay.exception.PluginException;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.payment.wechatpay.service.RequestConfigurationService;
@@ -16,6 +17,7 @@ import com.payline.payment.wechatpay.util.properties.ReleaseProperties;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
 import com.payline.pmapi.bean.configuration.parameter.impl.InputParameter;
+import com.payline.pmapi.bean.configuration.parameter.impl.ListBoxParameter;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.service.ConfigurationService;
 import lombok.extern.log4j.Log4j2;
@@ -44,6 +46,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         // sub merchant id
         parameters.add(buildInputParameter(ContractConfigurationKeys.SUB_MERCHANT_ID, true, locale));
 
+        final ListBoxParameter partnerTransactionIdListBoxParameter = new ListBoxParameter();
+        partnerTransactionIdListBoxParameter.setKey(ContractConfigurationKeys.PARTNER_TRANSACTION_ID);
+        partnerTransactionIdListBoxParameter.setLabel(i18n.getMessage("contract.partnerTransactionId.label", locale));
+        partnerTransactionIdListBoxParameter.setDescription(i18n.getMessage("contract.partnerTransactionId.description", locale));
+        final Map<String, String> partnerTransactionIdMap = new HashMap<>();
+        for (final PartnerTransactionIdOptions partnerTransactionIdOption : PartnerTransactionIdOptions.values()) {
+            partnerTransactionIdMap.put(partnerTransactionIdOption.name(), i18n.getMessage(partnerTransactionIdOption.getI18nKey(), locale));
+        }
+        partnerTransactionIdListBoxParameter.setList(partnerTransactionIdMap);
+        partnerTransactionIdListBoxParameter.setRequired(true);
+        parameters.add(partnerTransactionIdListBoxParameter);
         return parameters;
     }
 

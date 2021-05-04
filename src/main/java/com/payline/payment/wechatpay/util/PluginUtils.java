@@ -109,4 +109,25 @@ public class PluginUtils {
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         return format.format(new Date());
     }
+    /**
+     * Left pad a string with zeros
+     * @param input the string to pad
+     * @param targetSize   final size
+     * @return padded string
+     */
+    public static String leftPad(final String input, final int targetSize) {
+        final String result;
+        if (input == null || input.length() >= targetSize) {
+            result = input;
+        } else {
+            final StringBuilder stringBuilder = new StringBuilder();
+            // On construit un chaîne de 0 de taille targetSize
+            for (int i = 0; i < targetSize; i++) {
+                stringBuilder.append('0');
+            }
+            // On prend le nombre de 0 dont on a besoin (targetSize - input.size) et on concatene input
+            result = stringBuilder.substring(input.length()) + input;
+        }
+        return result;
+    }
 }

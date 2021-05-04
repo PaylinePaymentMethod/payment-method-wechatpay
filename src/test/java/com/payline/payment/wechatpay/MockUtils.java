@@ -3,6 +3,7 @@ package com.payline.payment.wechatpay;
 import com.payline.payment.wechatpay.bean.nested.Code;
 import com.payline.payment.wechatpay.bean.nested.SignType;
 import com.payline.payment.wechatpay.bean.response.Response;
+import com.payline.payment.wechatpay.enumeration.PartnerTransactionIdOptions;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
 import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.pmapi.bean.common.Buyer;
@@ -72,6 +73,10 @@ public class MockUtils {
         Map<String, ContractProperty> contractProperties = new HashMap<>();
         contractProperties.put(ContractConfigurationKeys.MERCHANT_ID, new ContractProperty("MERCHANTID"));
         contractProperties.put(ContractConfigurationKeys.SUB_MERCHANT_ID, new ContractProperty("SUBMERCHANTID"));
+        contractProperties.put(ContractConfigurationKeys.SECONDARY_MERCHANT_ID, new ContractProperty("1314520"));
+        contractProperties.put(ContractConfigurationKeys.MERCHANT_BANK_CODE, new ContractProperty("12345"));
+        contractProperties.put(ContractConfigurationKeys.PARTNER_TRANSACTION_ID, new ContractProperty(PartnerTransactionIdOptions.ORDER_REFERENCE.name()));
+
 
         return new ContractConfiguration("WeChatPay", contractProperties);
     }
@@ -93,6 +98,7 @@ public class MockUtils {
         partnerConfigurationMap.put(PartnerConfigurationKeys.KEY, "key");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SUB_APPID, "");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SIGN_TYPE, "MD5");
+        partnerConfigurationMap.put(PartnerConfigurationKeys.TERMINAL_NUMBER, "003");
 
         Map<String, String> sensitiveConfigurationMap = new HashMap<>();
 
