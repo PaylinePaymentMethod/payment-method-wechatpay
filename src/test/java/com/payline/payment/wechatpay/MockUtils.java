@@ -1,5 +1,8 @@
 package com.payline.payment.wechatpay;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.payline.payment.wechatpay.bean.configuration.Acquirer;
 import com.payline.payment.wechatpay.bean.nested.Code;
 import com.payline.payment.wechatpay.bean.nested.SignType;
 import com.payline.payment.wechatpay.bean.response.Response;
@@ -9,6 +12,7 @@ import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.configuration.request.ContractParametersRequest;
 import com.payline.pmapi.bean.notification.request.NotificationRequest;
 import com.payline.pmapi.bean.payment.*;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
@@ -18,6 +22,7 @@ import com.payline.pmapi.bean.paymentform.request.PaymentFormLogoRequest;
 import com.payline.pmapi.bean.refund.request.RefundRequest;
 import lombok.experimental.UtilityClass;
 
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -25,6 +30,26 @@ import java.util.*;
 public class MockUtils {
     public final String TRANSACTION_ID = "123456789012345678901";
     public final String PARTNER_TRANSACTION_ID = "098765432109876543210";
+
+    public static final String PLUGIN_CONFIGURATION =
+            "[" +
+                    "    {" +
+                    "        \"id\": \"1\"," +
+                    "        \"appId\": \"123456789\"," +
+                    "        \"label\": \"Label 1\"," +
+                    "        \"merchantId\": \"merchantId1\"," +
+                    "        \"key\": \"wechatPay_key1\"," +
+                    "        \"certificate\": \"certificate\"" +
+                    "    }," +
+                    "    {" +
+                    "        \"id\": \"1\"," +
+                    "        \"appId\": \"123456790\"," +
+                    "        \"label\": \"Label 2\"," +
+                    "        \"merchantId\": \"merchantId2\"," +
+                    "        \"key\": \"wechatPay_key2\"," +
+                    "        \"certificate\": \"certificate\"" +
+                    "    }" +
+                    "]";
 
     /**
      * Generate a valid Payline Amount.
@@ -71,11 +96,12 @@ public class MockUtils {
     public ContractConfiguration aContractConfiguration() {
 
         Map<String, ContractProperty> contractProperties = new HashMap<>();
-        contractProperties.put(ContractConfigurationKeys.MERCHANT_ID, new ContractProperty("MERCHANTID"));
+       // contractProperties.put(ContractConfigurationKeys.MERCHANT_ID, new ContractProperty("MERCHANTID"));
         contractProperties.put(ContractConfigurationKeys.SUB_MERCHANT_ID, new ContractProperty("SUBMERCHANTID"));
         contractProperties.put(ContractConfigurationKeys.SECONDARY_MERCHANT_ID, new ContractProperty("1314520"));
         contractProperties.put(ContractConfigurationKeys.MERCHANT_BANK_CODE, new ContractProperty("12345"));
         contractProperties.put(ContractConfigurationKeys.PARTNER_TRANSACTION_ID, new ContractProperty(PartnerTransactionIdOptions.ORDER_REFERENCE.name()));
+        contractProperties.put(ContractConfigurationKeys.ACQUIRER_ID, new ContractProperty("1"));
 
 
         return new ContractConfiguration("WeChatPay", contractProperties);
@@ -87,15 +113,15 @@ public class MockUtils {
     public PartnerConfiguration aPartnerConfiguration() {
         Map<String, String> partnerConfigurationMap = new HashMap<>();
 
-        partnerConfigurationMap.put(PartnerConfigurationKeys.APPID, "123456789");
-        partnerConfigurationMap.put(PartnerConfigurationKeys.CERTIFICATE, "Certificat");
+        partnerConfigurationMap.put("appId", "123456789");
+        partnerConfigurationMap.put("certificate", "Certificat");
         partnerConfigurationMap.put(PartnerConfigurationKeys.DEVICE_INFO, "WEB");
         partnerConfigurationMap.put(PartnerConfigurationKeys.QUERY_ORDER_URL, "https://api.mch.weixin.qq.com/pay/orderquery");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SUBMIT_REFUND_URL, "https://api.mch.weixin.qq.com/secapi/pay/refund");
         partnerConfigurationMap.put(PartnerConfigurationKeys.UNIFIED_ORDER_URL, "https://api.mch.weixin.qq.com/pay/unifiedorder");
         partnerConfigurationMap.put(PartnerConfigurationKeys.QUERY_REFUND_URL, "https://api.mch.weixin.qq.com/pay/queryrefund");
         partnerConfigurationMap.put(PartnerConfigurationKeys.DOWNLOAD_TRANSACTIONS_URL, "https://api.mch.weixin.qq.com/pay/downloadbill");
-        partnerConfigurationMap.put(PartnerConfigurationKeys.KEY, "key");
+        partnerConfigurationMap.put("key", "key");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SUB_APPID, "");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SIGN_TYPE, "MD5");
         partnerConfigurationMap.put(PartnerConfigurationKeys.TERMINAL_NUMBER, "003");
@@ -162,6 +188,7 @@ public class MockUtils {
                 .withContractConfiguration(aContractConfiguration())
                 .withEnvironment(anEnvironment())
                 .withLocale(Locale.getDefault())
+                .withPluginConfiguration(PLUGIN_CONFIGURATION)
                 .withPartnerConfiguration(aPartnerConfiguration());
     }
     public Response aResponseWithoutSign(){
@@ -286,6 +313,7 @@ public class MockUtils {
                 .withOrder(aPaylineOrder())
                 .withBuyer(aBuyer())
                 .withContractConfiguration(aContractConfiguration())
+                .withPluginConfiguration(PLUGIN_CONFIGURATION)
                 .withEnvironment(anEnvironment())
                 .withTransactionId(TRANSACTION_ID)
                 .withPartnerTransactionId(PARTNER_TRANSACTION_ID)
@@ -299,6 +327,7 @@ public class MockUtils {
                 .withContractConfiguration(aContractConfiguration())
                 .withEnvironment(anEnvironment())
                 .withPartnerConfiguration(aPartnerConfiguration())
+                .withPluginConfiguration(PLUGIN_CONFIGURATION)
                 .withHttpMethod("POST")
                 .withHeaderInfos(new HashMap<>())
                 .withPathInfo("aPathInfo")
@@ -327,6 +356,7 @@ public class MockUtils {
                 .withLocale(Locale.getDefault())
                 .withOrder(aPaylineOrder())
                 .withPartnerConfiguration(aPartnerConfiguration())
+                .withPluginConfiguration(PLUGIN_CONFIGURATION)
                 .withPaymentFormContext(aPaymentFormContext())
                 .withSoftDescriptor("Test")
                 .withTransactionId("PAYLINE"+randomTransactionId);
@@ -365,6 +395,7 @@ public class MockUtils {
                 .withContractConfiguration(aContractConfiguration())
                 .withEnvironment(anEnvironment())
                 .withPartnerConfiguration(aPartnerConfiguration())
+                .withPluginConfiguration(PLUGIN_CONFIGURATION)
                 .withAmount(aPaylineAmount())
                 .withBuyer(aBuyer())
                 .withOrder(aPaylineOrder());
@@ -394,5 +425,43 @@ public class MockUtils {
                 .withLocale(Locale.FRANCE)
                 .withOrder(aPaylineOrder())
                 .withPartnerConfiguration(aPartnerConfiguration());
+    }
+
+    /**
+     * Generate a valid {@link ContractParametersCheckRequest}.
+     */
+    public static ContractParametersRequest aContractParametersRequest() {
+        return aContractParametersRequestBuilder().build();
+    }
+    /**
+     * Generate a builder for a valid {@link ContractParametersRequest}.
+     * This way, some attributes may be overridden to match specific test needs.
+     */
+    public static ContractParametersRequest.ContractParametersRequestBuilder aContractParametersRequestBuilder() {
+        return ContractParametersRequest.builder()
+                .environment(anEnvironment())
+                .locale(Locale.getDefault())
+                .partnerConfiguration(aPartnerConfiguration())
+                .pluginConfiguration(PLUGIN_CONFIGURATION);
+    }
+
+    /**
+     * Generate a valid Acquirer list
+     */
+    public static List<Acquirer> acquirers()  {
+        final Gson gson = new Gson();
+        final Type type = new TypeToken<List<Acquirer>>(){}.getType();
+        final List<Acquirer> acquirerList = gson.fromJson(PLUGIN_CONFIGURATION, type);
+        return acquirerList;
+    }
+
+    public static Object anAcquirer() {
+        return Acquirer.builder()
+                .id("id")
+                .key("key")
+                .appId("appId")
+                .label("label")
+                .merchantId("merchantId")
+                .build();
     }
 }

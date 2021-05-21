@@ -6,10 +6,7 @@ import com.payline.payment.wechatpay.bean.nested.TradeType;
 import com.payline.payment.wechatpay.bean.request.UnifiedOrderRequest;
 import com.payline.payment.wechatpay.bean.response.UnifiedOrderResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
-import com.payline.payment.wechatpay.service.HttpService;
-import com.payline.payment.wechatpay.service.PartnerTransactionIdService;
-import com.payline.payment.wechatpay.service.QRCodeService;
-import com.payline.payment.wechatpay.service.RequestConfigurationService;
+import com.payline.payment.wechatpay.service.*;
 import com.payline.payment.wechatpay.util.PluginUtils;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
 import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
@@ -27,6 +24,7 @@ public class PaymentServiceImpl implements PaymentService {
     private HttpService httpService = HttpService.getInstance();
     private QRCodeService qrCodeService = QRCodeService.getInstance();
     private PartnerTransactionIdService partnerTransactionIdService = PartnerTransactionIdService.getInstance();
+    private AcquirerService acquirerService = AcquirerService.getInstance();
 
 
     @Override
@@ -65,6 +63,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private UnifiedOrderRequest buildUnifiedOrderRequest(final PaymentRequest paymentRequest, final RequestConfiguration configuration) {
+        final String appId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getAppId();
+        final String merchantId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getMerchantId();
+
         return UnifiedOrderRequest.builder()
                 .body(paymentRequest.getSoftDescriptor())
                 .outTradeNo(partnerTransactionIdService.retrievePartnerTransactionId(paymentRequest))
@@ -75,8 +78,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .notifyUrl(configuration.getEnvironment().getNotificationURL())
                 .tradeType(TradeType.NATIVE)
                 .productId(paymentRequest.getOrder().getReference())
-                .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                .appId(appId)
+                .merchantId(merchantId)
                 .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                 .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                 .nonceStr(PluginUtils.generateRandomString(32))

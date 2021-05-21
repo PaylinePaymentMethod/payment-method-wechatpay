@@ -2,6 +2,7 @@ package com.payline.payment.wechatpay.service.impl;
 
 import com.payline.payment.wechatpay.MockUtils;
 import com.payline.payment.wechatpay.exception.InvalidDataException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
@@ -15,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 class PaymentServiceImplTest {
     @InjectMocks
@@ -27,9 +29,14 @@ class PaymentServiceImplTest {
         MockitoAnnotations.initMocks(this);
     }
 
+    @Mock
+    private AcquirerService acquirerService;
+
     @Test
     void paymentRequest_PluginException() {
         Mockito.doThrow(new InvalidDataException("foo")).when(httpService).unifiedOrder(any(), any());
+
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         // when: sending the request, a PluginException is thrown
         PaymentResponse paymentResponse =  service.paymentRequest(MockUtils.aPaylinePaymentRequest());

@@ -7,6 +7,7 @@ import com.payline.payment.wechatpay.bean.nested.TradeState;
 import com.payline.payment.wechatpay.bean.response.NotificationMessage;
 import com.payline.payment.wechatpay.bean.response.QueryOrderResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.payment.wechatpay.util.Converter;
 import com.payline.payment.wechatpay.util.XMLService;
@@ -35,6 +36,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 
 class NotificationServiceImplTest {
     @InjectMocks
@@ -50,6 +52,9 @@ class NotificationServiceImplTest {
 
     @Mock
     SignatureUtil signatureUtil;
+
+    @Mock
+    private AcquirerService acquirerService;
 
 
     String message = "<xml>" +
@@ -86,6 +91,7 @@ class NotificationServiceImplTest {
         Mockito.doReturn(map).when(xmlService).xmlToMap(any());
 
         Mockito.doReturn(true).when(signatureUtil).isSignatureValid(any(), any(), any());
+        Mockito.doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         NotificationMessage notificationMessage = NotificationMessage.builder()
                 .appId("appId")
@@ -142,6 +148,7 @@ class NotificationServiceImplTest {
         Mockito.doReturn(map).when(xmlService).xmlToMap(any());
 
         Mockito.doReturn(true).when(signatureUtil).isSignatureValid(any(), any(), any());
+        Mockito.doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         NotificationMessage notificationMessage = NotificationMessage.builder()
                 .appId("appId")
@@ -201,6 +208,7 @@ class NotificationServiceImplTest {
         Mockito.doReturn(map).when(xmlService).xmlToMap(any());
 
         Mockito.doReturn(true).when(signatureUtil).isSignatureValid(any(), any(), any());
+        Mockito.doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         NotificationMessage notificationMessage = NotificationMessage.builder()
                 .appId("appId")

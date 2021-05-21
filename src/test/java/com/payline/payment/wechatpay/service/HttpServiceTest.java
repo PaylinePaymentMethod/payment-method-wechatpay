@@ -26,6 +26,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 
 class HttpServiceTest {
     @InjectMocks
@@ -34,7 +35,8 @@ class HttpServiceTest {
     RequestConfiguration configuration = new RequestConfiguration(
             MockUtils.aContractConfiguration()
             , MockUtils.anEnvironment()
-            , MockUtils.aPartnerConfiguration());
+            , MockUtils.aPartnerConfiguration()
+            , MockUtils.PLUGIN_CONFIGURATION);
     @Mock
     private HttpClient client;
 
@@ -46,6 +48,9 @@ class HttpServiceTest {
 
     @Mock
     private ErrorConverter errorConverter;
+
+    @Mock
+    private AcquirerService acquirerService;
 
     @BeforeEach
     void setUp() {
@@ -67,6 +72,7 @@ class HttpServiceTest {
         // create Mocks
         Map<String, String> map = new HashMap<>();
         map.put("1", "2");
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
@@ -117,6 +123,7 @@ class HttpServiceTest {
     void queryOrder() {
         // create Mocks
         Map<String, String> map = new HashMap<>();
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
         map.put("1", "2");
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
@@ -170,6 +177,7 @@ class HttpServiceTest {
         // create Mocks
         Map<String, String> map = new HashMap<>();
         map.put("1", "2");
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
@@ -222,6 +230,7 @@ class HttpServiceTest {
         // create Mocks
         Map<String, String> map = new HashMap<>();
         map.put("1", "2");
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 
@@ -273,6 +282,7 @@ class HttpServiceTest {
         // create Mocks
         Map<String, String> map = new HashMap<>();
         map.put("1", "2");
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
         Mockito.doReturn(map).when(converter).objectToMap(any());
         Mockito.doReturn("thisIsASignedXMLMessage").when(signatureUtil).generateSignedXml(any(), any(), any());
 

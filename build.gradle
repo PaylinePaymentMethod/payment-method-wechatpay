@@ -40,6 +40,8 @@ dependencies {
     // QRCode
     implementation group: 'com.google.zxing', name: 'javase', version: '3.4.1'
 
+    implementation group:'com.fasterxml.jackson.dataformat', name:'jackson-dataformat-xml', version :jacksonVersion
+
     // lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
