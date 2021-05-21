@@ -130,11 +130,12 @@ public class HttpClient {
                     .build();
 
 
-            char[] password = configuration.getContractConfiguration()
-                    .getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue().toCharArray();
+            char[] password = "110605603".toCharArray(); //configuration.getContractConfiguration()
+                    //.getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue().toCharArray();
 
-            File file = new File(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.CERTIFICATE));
-            try(InputStream certStream = new FileInputStream(file)){
+//            File file = new File(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.CERTIFICATE));
+
+            try(InputStream certStream = this.getClass().getClassLoader().getResourceAsStream("apiclient_cert.p12")){
                 KeyStore ks = KeyStore.getInstance("PKCS12");
                 ks.load(certStream, password);
 
