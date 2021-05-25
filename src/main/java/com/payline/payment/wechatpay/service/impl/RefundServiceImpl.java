@@ -9,6 +9,7 @@ import com.payline.payment.wechatpay.bean.request.SubmitRefundRequest;
 import com.payline.payment.wechatpay.bean.response.QueryRefundResponse;
 import com.payline.payment.wechatpay.bean.response.SubmitRefundResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.payment.wechatpay.service.RequestConfigurationService;
 import com.payline.payment.wechatpay.util.PluginUtils;
@@ -25,6 +26,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class RefundServiceImpl implements RefundService {
     HttpService httpService = HttpService.getInstance();
+    private AcquirerService acquirerService = AcquirerService.getInstance();
 
     @Override
     public RefundResponse refundRequest(RefundRequest refundRequest) {
@@ -34,10 +36,15 @@ public class RefundServiceImpl implements RefundService {
         try {
             RequestConfiguration configuration = RequestConfigurationService.getInstance().build(refundRequest);
 
+            final String appId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getAppId();
+            final String merchantId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getMerchantId();
+
             // create refund
             SubmitRefundRequest submitRefundRequest = SubmitRefundRequest.builder()
-                    .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                    .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                    .appId(appId)
+                    .merchantId(merchantId)
                     .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                     .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                     .nonceStr(PluginUtils.generateRandomString(32))
@@ -55,8 +62,8 @@ public class RefundServiceImpl implements RefundService {
 
             // ask for refund status
             QueryRefundRequest queryRefundRequest = QueryRefundRequest.builder()
-                    .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                    .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                    .appId(appId)
+                    .merchantId(merchantId)
                     .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                     .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                     .nonceStr(PluginUtils.generateRandomString(32))

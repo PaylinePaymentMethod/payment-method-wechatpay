@@ -3,9 +3,9 @@ package com.payline.payment.wechatpay.util.http;
 
 import com.payline.payment.wechatpay.bean.configuration.RequestConfiguration;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.StringResponseService;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
-import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.payment.wechatpay.util.properties.ConfigProperties;
 import com.payline.pmapi.bean.common.FailureCause;
 import lombok.extern.log4j.Log4j2;
@@ -56,6 +56,7 @@ public class HttpClient {
 
     // --- Singleton Holder pattern + initialization BEGIN
 
+    private AcquirerService acquirerService = AcquirerService.getInstance();
     private HttpClient() {
         int connectionRequestTimeout;
         int connectTimeout;
@@ -128,12 +129,16 @@ public class HttpClient {
                     .setConnectTimeout(connectTimeout * 1000)
                     .setSocketTimeout(socketTimeout * 1000)
                     .build();
+            final String merchantId=acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getMerchantId();
 
 
-            char[] password = configuration.getContractConfiguration()
-                    .getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue().toCharArray();
+            char[] password = merchantId.toCharArray();
 
-            File file = new File(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.CERTIFICATE));
+            final String certificate=acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getCertificate();
+
+            File file = new File(certificate);
             try(InputStream certStream = new FileInputStream(file)){
                 KeyStore ks = KeyStore.getInstance("PKCS12");
                 ks.load(certStream, password);

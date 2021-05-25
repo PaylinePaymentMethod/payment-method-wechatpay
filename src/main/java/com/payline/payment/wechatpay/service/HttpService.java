@@ -8,6 +8,7 @@ import com.payline.payment.wechatpay.exception.InvalidDataException;
 import com.payline.payment.wechatpay.exception.PluginException;
 import com.payline.payment.wechatpay.util.Converter;
 import com.payline.payment.wechatpay.util.ErrorConverter;
+import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
 import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.payment.wechatpay.util.http.HttpClient;
 import com.payline.payment.wechatpay.util.http.StringResponse;
@@ -33,6 +34,7 @@ public class HttpService {
     private Converter converter = Converter.getInstance();
     private SignatureUtil signatureUtil = SignatureUtil.getInstance();
     private ErrorConverter errorConverter = ErrorConverter.getInstance();
+    private AcquirerService acquirerService = AcquirerService.getInstance();
 
     public static HttpService getInstance() {
         return Holder.instance;
@@ -49,7 +51,8 @@ public class HttpService {
     public UnifiedOrderResponse unifiedOrder(RequestConfiguration configuration, UnifiedOrderRequest request) {
         try {
             // get needed data
-            String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
+            String key = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getKey();
 
             URI uri = new URI(configuration
                     .getPartnerConfiguration()
@@ -78,7 +81,9 @@ public class HttpService {
     public QueryOrderResponse queryOrder(RequestConfiguration configuration, QueryOrderRequest request) {
         try {
             // get needed data
-            String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
+            String key = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getKey();
+
 
             URI uri = new URI(configuration
                     .getPartnerConfiguration()
@@ -109,7 +114,9 @@ public class HttpService {
     public SubmitRefundResponse submitRefund(RequestConfiguration configuration, SubmitRefundRequest request) {
         try {
             // get needed data
-            String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
+            String key = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getKey();
+
 
             client.init(configuration);
 
@@ -140,7 +147,9 @@ public class HttpService {
     public QueryRefundResponse queryRefund(RequestConfiguration configuration, QueryRefundRequest request) {
         try {
             // get needed data
-            String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
+            String key = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getKey();
+
 
             URI uri = new URI(configuration
                     .getPartnerConfiguration()
@@ -169,7 +178,9 @@ public class HttpService {
     public Response downloadTransactionHistory(RequestConfiguration configuration, DownloadTransactionHistoryRequest request) {
         try {
             // get needed data
-            String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
+            String key = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getKey();
+
 
             URI uri = new URI(configuration
                     .getPartnerConfiguration()

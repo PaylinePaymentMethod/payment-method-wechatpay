@@ -7,6 +7,7 @@ import com.payline.payment.wechatpay.bean.nested.RefundStatus;
 import com.payline.payment.wechatpay.bean.response.QueryRefundResponse;
 import com.payline.payment.wechatpay.bean.response.SubmitRefundResponse;
 import com.payline.payment.wechatpay.exception.InvalidDataException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.refund.request.RefundRequest;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 class RefundServiceImplTest {
     String refundId = "123456789";
@@ -34,6 +36,9 @@ class RefundServiceImplTest {
 
     @Mock
     private HttpService httpService;
+
+    @Mock
+    private AcquirerService acquirerService;
 
     @BeforeEach
     void setUp() {
@@ -67,6 +72,7 @@ class RefundServiceImplTest {
                 .refunds(refunds)
                 .build();
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
 
         // call method
@@ -108,6 +114,8 @@ class RefundServiceImplTest {
                 .refunds(refunds)
                 .build();
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
+
 
 
         // call method
@@ -149,6 +157,7 @@ class RefundServiceImplTest {
                 .refunds(refunds)
                 .build();
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
 
         // call method
@@ -191,6 +200,7 @@ class RefundServiceImplTest {
                 .refunds(refunds)
                 .build();
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
 
         // call method
@@ -210,6 +220,7 @@ class RefundServiceImplTest {
     void refundRequestPluginException() {
         // create Mocks
         Mockito.doThrow(new InvalidDataException("foo")).when(httpService).submitRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         // call method
         RefundRequest refundRequest = MockUtils.aRefundRequestBuilder().build();
@@ -228,6 +239,7 @@ class RefundServiceImplTest {
     void refundRequestRuntimeException() {
         // create Mocks
         Mockito.doThrow(new NullPointerException("foo")).when(httpService).submitRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         // call method
         RefundRequest refundRequest = MockUtils.aRefundRequestBuilder().build();

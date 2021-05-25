@@ -1,5 +1,6 @@
 package com.payline.payment.wechatpay.service.impl;
 
+import com.payline.payment.wechatpay.bean.configuration.Acquirer;
 import com.payline.payment.wechatpay.bean.configuration.RequestConfiguration;
 import com.payline.payment.wechatpay.bean.nested.Code;
 import com.payline.payment.wechatpay.bean.nested.SignType;
@@ -7,6 +8,7 @@ import com.payline.payment.wechatpay.bean.request.DownloadTransactionHistoryRequ
 import com.payline.payment.wechatpay.bean.response.Response;
 import com.payline.payment.wechatpay.enumeration.PartnerTransactionIdOptions;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.payment.wechatpay.service.RequestConfigurationService;
 import com.payline.payment.wechatpay.util.PluginUtils;
@@ -19,6 +21,7 @@ import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
 import com.payline.pmapi.bean.configuration.parameter.impl.InputParameter;
 import com.payline.pmapi.bean.configuration.parameter.impl.ListBoxParameter;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.configuration.request.ContractParametersRequest;
 import com.payline.pmapi.service.ConfigurationService;
 import lombok.extern.log4j.Log4j2;
 
@@ -35,17 +38,35 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private final I18nService i18n = I18nService.getInstance();
 
     private static final String I18N_CONTRACT_PREFIX = "contract.";
+    private AcquirerService acquirerService = AcquirerService.getInstance();
+
 
     @Override
     public List<AbstractParameter> getParameters(Locale locale) {
+        throw new IllegalStateException("Method not allowed");
+    }
+
+    @Override
+    public List<AbstractParameter> getParameters(final ContractParametersRequest request) {
+        final Locale locale = request.getLocale();
         List<AbstractParameter> parameters = new ArrayList<>();
 
-        // merchant id
-        parameters.add(buildInputParameter(ContractConfigurationKeys.MERCHANT_ID, true, locale));
+        // ACQUIRER
+        final List<Acquirer> acquirers = acquirerService.retrieveAcquirers(request.getPluginConfiguration());
+        final ListBoxParameter acquirerListBoxParameter = new ListBoxParameter();
+        acquirerListBoxParameter.setKey(ContractConfigurationKeys.ACQUIRER_ID);
+        acquirerListBoxParameter.setLabel(i18n.getMessage("contract.acquirer.label", locale));
+        acquirerListBoxParameter.setDescription(i18n.getMessage("contract.acquirer.description", locale));
+        final Map<String, String> acquirerMap = new HashMap<>();
+        acquirers.forEach((acquirer->acquirerMap.put(acquirer.getAppId(), acquirer.getLabel())));
+        acquirerListBoxParameter.setList(acquirerMap);
+        acquirerListBoxParameter.setRequired(true);
 
+        parameters.add(acquirerListBoxParameter);
         // sub merchant id
         parameters.add(buildInputParameter(ContractConfigurationKeys.SUB_MERCHANT_ID, true, locale));
 
+        //partner transaction id
         final ListBoxParameter partnerTransactionIdListBoxParameter = new ListBoxParameter();
         partnerTransactionIdListBoxParameter.setKey(ContractConfigurationKeys.PARTNER_TRANSACTION_ID);
         partnerTransactionIdListBoxParameter.setLabel(i18n.getMessage("contract.partnerTransactionId.label", locale));
@@ -67,9 +88,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             // check il all mandatory fields are filled
             Map<String, String> accountInfo = contractParametersCheckRequest.getAccountInfo();
             Locale locale = contractParametersCheckRequest.getLocale();
-
             // check required fields
-            for (AbstractParameter param : this.getParameters(locale)) {
+            final ContractParametersRequest contractParametersRequest = ContractParametersRequest.builder()
+                    .pluginConfiguration(contractParametersCheckRequest.getPluginConfiguration())
+                    .locale(locale)
+                    .build();
+            for (AbstractParameter param : this.getParameters(contractParametersRequest)) {
                 if (param.isRequired() && accountInfo.get(param.getKey()) == null) {
                     log.info("contract param: {} is mandatory but missing", param.getKey());
                     String message = i18n.getMessage(I18N_CONTRACT_PREFIX + param.getKey() + ".requiredError", locale);
@@ -129,9 +153,14 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         // call for a getCheckoutSession with a bad checkoutSession id
         final RequestConfiguration configuration = RequestConfigurationService.getInstance().build(contractParametersCheckRequest);
         // call WechatPay API
+        final String appId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getAppId();
+        final String merchantId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getMerchantId();
+
         final DownloadTransactionHistoryRequest downloadTransactionHistoryRequest = DownloadTransactionHistoryRequest.builder()
-                .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                .appId(appId)
+                .merchantId(merchantId)
                 .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                 .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                 .nonceStr(PluginUtils.generateRandomString(32))

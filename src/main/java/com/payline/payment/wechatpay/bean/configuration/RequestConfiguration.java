@@ -25,8 +25,9 @@ public class RequestConfiguration {
     private ContractConfiguration contractConfiguration;
     private Environment environment;
     private PartnerConfiguration partnerConfiguration;
+    private String pluginConfiguration;
 
-    public RequestConfiguration(ContractConfiguration contractConfiguration, Environment environment, PartnerConfiguration partnerConfiguration) {
+    public RequestConfiguration(ContractConfiguration contractConfiguration, Environment environment, PartnerConfiguration partnerConfiguration, String pluginConfiguration) {
         if (contractConfiguration == null) {
             throw new InvalidDataException("Missing request contractConfiguration");
         }
@@ -36,10 +37,16 @@ public class RequestConfiguration {
         if (partnerConfiguration == null) {
             throw new InvalidDataException("Missing request partnerConfiguration");
         }
+        if( pluginConfiguration == null ){
+            throw new InvalidDataException("Missing request pluginConfiguration");
+        }
         this.contractConfiguration = contractConfiguration;
         this.environment = environment;
         this.partnerConfiguration = partnerConfiguration;
+        this.pluginConfiguration = pluginConfiguration;
     }
+
+    public String getPluginConfiguration() { return pluginConfiguration;}
 
     public ContractConfiguration getContractConfiguration() {
         return contractConfiguration;
@@ -54,7 +61,7 @@ public class RequestConfiguration {
     }
 
     public static RequestConfiguration build(CaptureRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(ContractParametersCheckRequest request) {
@@ -65,34 +72,34 @@ public class RequestConfiguration {
 
         }
 
-        return new RequestConfiguration(configuration, request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(configuration, request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(NotificationRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(PaymentFormConfigurationRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(PaymentRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(RefundRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(ResetRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(RetrievePluginConfigurationRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 
     public static RequestConfiguration build(TransactionStatusRequest request) {
-        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration());
+        return new RequestConfiguration(request.getContractConfiguration(), request.getEnvironment(), request.getPartnerConfiguration(),request.getPluginConfiguration());
     }
 }

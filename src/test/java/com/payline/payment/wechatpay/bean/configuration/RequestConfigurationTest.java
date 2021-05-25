@@ -14,11 +14,12 @@ class RequestConfigurationTest {
     private Environment environment = MockUtils.anEnvironment();
     private PartnerConfiguration partnerConfiguration = MockUtils.aPartnerConfiguration();
     private ContractConfiguration contractConfiguration = MockUtils.aContractConfiguration();
+    private String pluginConfiguration =MockUtils.PLUGIN_CONFIGURATION;
     @Test
     void constructor_nominal(){
         // given: the constructor is passed valid arguments, when: calling the constructor
         RequestConfiguration requestConfiguration = new RequestConfiguration( contractConfiguration,
-                environment, partnerConfiguration);
+                environment, partnerConfiguration, pluginConfiguration );
         // then: the instance is not null, no exception is thrown
         assertNotNull( requestConfiguration );
     }
@@ -27,21 +28,21 @@ class RequestConfigurationTest {
     void constructor_nullContractConfiguration(){
         // given: the constructor is a null ContractConfiguration, when: calling the constructor, then: an exception is thrown
         assertThrows(PluginException.class, () -> new RequestConfiguration( null,
-                environment, partnerConfiguration) );
+                environment, partnerConfiguration, pluginConfiguration) );
     }
 
     @Test
     void constructor_nullEnvironment(){
         // given: the constructor is a null ContractConfiguration, when: calling the constructor, then: an exception is thrown
         assertThrows(PluginException.class, () -> new RequestConfiguration( contractConfiguration,
-                null,partnerConfiguration) );
+                null,partnerConfiguration, pluginConfiguration) );
     }
 
     @Test
     void constructor_nullPartnerConfiguration(){
         // given: the constructor is a null ContractConfiguration, when: calling the constructor, then: an exception is thrown
         assertThrows(PluginException.class, () -> new RequestConfiguration( contractConfiguration,
-                environment, null ) );
+                environment, null, pluginConfiguration ) );
     }
 
 }

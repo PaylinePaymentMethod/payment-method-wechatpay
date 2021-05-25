@@ -7,6 +7,7 @@ import com.payline.payment.wechatpay.bean.request.QueryOrderRequest;
 import com.payline.payment.wechatpay.bean.response.NotificationMessage;
 import com.payline.payment.wechatpay.bean.response.QueryOrderResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.payment.wechatpay.service.RequestConfigurationService;
 import com.payline.payment.wechatpay.util.Converter;
@@ -37,6 +38,7 @@ public class NotificationServiceImpl implements NotificationService {
     private XMLService xmlService = XMLService.getInstance();
     private HttpService httpService = HttpService.getInstance();
     private SignatureUtil signatureUtil = SignatureUtil.getInstance();
+    private AcquirerService acquirerService = AcquirerService.getInstance();
 
     private static final String HTTP_BODY = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
 
@@ -62,9 +64,13 @@ public class NotificationServiceImpl implements NotificationService {
             String transactionId = message.getTransactionId();
 
             // call WeChatPay API to get the transaction status
+            final String appId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getAppId();
+            final String merchantId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                    configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getMerchantId();
             QueryOrderRequest queryOrderRequest = QueryOrderRequest.builder()
-                    .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                    .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                    .appId(appId)
+                    .merchantId(merchantId)
                     .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                     .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                     .deviceInfo(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.DEVICE_INFO))
@@ -131,7 +137,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void checkSignature(final RequestConfiguration configuration, final String notificationMessage, final Map<String, String> mNotificationMessage) {
         // verify Signature
-        String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
+        String key = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getKey();
+
         SignType signType = SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE));
         if (!signatureUtil.isSignatureValid(mNotificationMessage, key, signType.getType())) {
             log.error("Invalid sign value in XML: {}", notificationMessage);

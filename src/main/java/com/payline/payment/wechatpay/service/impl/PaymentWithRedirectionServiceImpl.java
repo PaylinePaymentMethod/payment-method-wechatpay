@@ -10,6 +10,7 @@ import com.payline.payment.wechatpay.bean.request.QueryRefundRequest;
 import com.payline.payment.wechatpay.bean.response.QueryOrderResponse;
 import com.payline.payment.wechatpay.bean.response.QueryRefundResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.payment.wechatpay.service.RequestConfigurationService;
 import com.payline.payment.wechatpay.util.PluginUtils;
@@ -29,6 +30,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirectionService {
     HttpService httpService = HttpService.getInstance();
+    private AcquirerService acquirerService = AcquirerService.getInstance();
 
     @Override
     public PaymentResponse finalizeRedirectionPayment(RedirectionPaymentRequest redirectionPaymentRequest) {
@@ -72,10 +74,14 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
     protected PaymentResponse fetchRefundStatus(TransactionStatusRequest request, RequestConfiguration configuration){
         PaymentResponse paymentResponse;
         String refundId = request.getTransactionId().replace("REFUND", "");
+        final String appId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getAppId();
+        final String merchantId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getMerchantId();
 
         QueryRefundRequest queryRefundRequest = QueryRefundRequest.builder()
-                .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                .appId(appId)
+                .merchantId(merchantId)
                 .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                 .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                 .nonceStr(PluginUtils.generateRandomString(32))
@@ -134,10 +140,14 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
     public PaymentResponse getPaymentStatus(TransactionStatusRequest request, RequestConfiguration configuration){
     PaymentResponse paymentResponse;
+        final String appId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getAppId();
+        final String merchantId = acquirerService.fetchAcquirer(configuration.getPluginConfiguration(),
+                configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.ACQUIRER_ID).getValue()).getMerchantId();
 
         QueryOrderRequest queryOrderRequest = QueryOrderRequest.builder()
-                .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
+                .appId(appId)
+                .merchantId(merchantId)
                 .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                 .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                 .deviceInfo(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.DEVICE_INFO))

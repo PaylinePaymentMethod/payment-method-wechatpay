@@ -6,6 +6,7 @@ import com.payline.payment.wechatpay.bean.nested.*;
 import com.payline.payment.wechatpay.bean.response.QueryOrderResponse;
 import com.payline.payment.wechatpay.bean.response.QueryRefundResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.TransactionStatusRequest;
@@ -24,6 +25,7 @@ import java.util.List;
 import static com.payline.payment.wechatpay.MockUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 class PaymentWithRedirectionServiceImplTest {
 
@@ -33,10 +35,14 @@ class PaymentWithRedirectionServiceImplTest {
     @Mock
     private HttpService httpService;
 
+    @Mock
+    private AcquirerService acquirerService;
+
     RequestConfiguration configuration = new RequestConfiguration(
             MockUtils.aContractConfiguration()
             , MockUtils.anEnvironment()
-            , MockUtils.aPartnerConfiguration());
+            , MockUtils.aPartnerConfiguration()
+            , PLUGIN_CONFIGURATION);
 
     @BeforeEach
     void setup() {
@@ -130,6 +136,7 @@ class PaymentWithRedirectionServiceImplTest {
                 .build();
 
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         PaymentResponse response = service.handleSessionExpired(MockUtils.aPaylineTransactionStatusRequest());
 
@@ -158,6 +165,7 @@ class PaymentWithRedirectionServiceImplTest {
                 .build();
 
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         PaymentResponse response = service.handleSessionExpired(MockUtils.aPaylineTransactionStatusRequest());
 
@@ -187,6 +195,7 @@ class PaymentWithRedirectionServiceImplTest {
                 .build();
 
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         PaymentResponse response = service.handleSessionExpired(MockUtils.aPaylineTransactionStatusRequest());
 
@@ -212,6 +221,8 @@ class PaymentWithRedirectionServiceImplTest {
                 .build();
 
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
+
         TransactionStatusRequest transactionStatusRequest = MockUtils.aPaylineTransactionStatusRequestBuilder().build();
         PaymentResponse response = service.fetchRefundStatus(transactionStatusRequest, configuration);
 
@@ -236,6 +247,8 @@ class PaymentWithRedirectionServiceImplTest {
                 .build();
 
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
+
         TransactionStatusRequest transactionStatusRequest = MockUtils.aPaylineTransactionStatusRequestBuilder().build();
         PaymentResponse response = service.fetchRefundStatus(transactionStatusRequest, configuration);
 
@@ -260,6 +273,7 @@ class PaymentWithRedirectionServiceImplTest {
                 .build();
 
         Mockito.doReturn(queryRefundResponse).when(httpService).queryRefund(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
         TransactionStatusRequest transactionStatusRequest = MockUtils.aPaylineTransactionStatusRequestBuilder().build();
         PaymentResponse response = service.fetchRefundStatus(transactionStatusRequest, configuration);
 

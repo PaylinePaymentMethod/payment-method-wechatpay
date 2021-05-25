@@ -4,12 +4,14 @@ import com.payline.payment.wechatpay.MockUtils;
 import com.payline.payment.wechatpay.bean.nested.Code;
 import com.payline.payment.wechatpay.bean.response.Response;
 import com.payline.payment.wechatpay.exception.InvalidDataException;
+import com.payline.payment.wechatpay.service.AcquirerService;
 import com.payline.payment.wechatpay.service.HttpService;
 import com.payline.payment.wechatpay.util.properties.ReleaseProperties;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
 import com.payline.pmapi.bean.configuration.parameter.impl.ListBoxParameter;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.configuration.request.ContractParametersRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,6 +43,9 @@ class ConfigurationServiceImplTest {
     @Mock
     private HttpService httpService;
 
+    @Mock
+    private AcquirerService acquirerService;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.initMocks(this);
@@ -57,8 +62,9 @@ class ConfigurationServiceImplTest {
     @ParameterizedTest
     @MethodSource("getLocales")
     void getParameters(Locale locale) {
-        List<AbstractParameter> parameters = service.getParameters(locale);
-
+        final ContractParametersRequest contractParametersRequest = MockUtils.aContractParametersRequest();
+        doReturn(MockUtils.acquirers()).when(acquirerService).retrieveAcquirers(MockUtils.PLUGIN_CONFIGURATION);
+        List<AbstractParameter> parameters = service.getParameters(contractParametersRequest);
         assertEquals(3, parameters.size());
 
         for (AbstractParameter p : parameters) {
@@ -87,6 +93,9 @@ class ConfigurationServiceImplTest {
                 .errorCode("20002")
                 .build();
         doReturn(response).when(httpService).downloadTransactionHistory(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
+
+
 
         ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
         Map<String, String> errors = service.check(request);
@@ -106,6 +115,7 @@ class ConfigurationServiceImplTest {
                 .resultCode(Code.FAIL)
                 .errorCode("20003")
                 .build();
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
         doReturn(response).when(httpService).downloadTransactionHistory(any(), any());
 
         ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
@@ -120,6 +130,7 @@ class ConfigurationServiceImplTest {
     @Test
     void checkPluginException(){
         Mockito.doThrow(new InvalidDataException("foo")).when(httpService).downloadTransactionHistory(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
         Map<String, String> errors = service.check(request);
@@ -131,6 +142,7 @@ class ConfigurationServiceImplTest {
     @Test
     void checkRuntimeException(){
         Mockito.doThrow(new NullPointerException("foo")).when(httpService).downloadTransactionHistory(any(), any());
+        doReturn(MockUtils.anAcquirer()).when(acquirerService).fetchAcquirer(MockUtils.PLUGIN_CONFIGURATION, "1");
 
         ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
         Map<String, String> errors = service.check(request);
