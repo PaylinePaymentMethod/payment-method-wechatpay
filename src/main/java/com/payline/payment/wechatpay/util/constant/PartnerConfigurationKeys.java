@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PartnerConfigurationKeys {
-    public static final String CERTIFICATE = "certificate";
     public static final String UNIFIED_ORDER_URL = "unifiedOrderUrl";
     public static final String QUERY_ORDER_URL = "queryOrderUrl";
     public static final String SUBMIT_REFUND_URL = "submitRefundUrl";
@@ -17,5 +16,4 @@ public class PartnerConfigurationKeys {
     public static final String SUB_APPID = "subAppId";
     public static final String SIGN_TYPE = "signType";
     public static final String DEVICE_INFO = "device";
-    public static final String TERMINAL_NUMBER = "TERMINAL_NUMBER";
 }

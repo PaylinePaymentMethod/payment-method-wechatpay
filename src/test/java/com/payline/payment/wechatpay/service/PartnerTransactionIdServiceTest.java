@@ -34,9 +34,9 @@ import static org.mockito.Mockito.doReturn;
                 .put(ContractConfigurationKeys.PARTNER_TRANSACTION_ID, new ContractProperty(PartnerTransactionIdOptions.EDEL.name()));
         final String partnerTransactionId = "partnerTransactionId";
 
-        doReturn(partnerTransactionId).when(underTest).computeEdelPartnerTransactionId(paymentRequest);
+        doReturn(partnerTransactionId).when(underTest).computeEdelPartnerTransactionId(paymentRequest.getContractConfiguration(),paymentRequest.getTransactionId());
 
-        final String result = underTest.retrievePartnerTransactionId(paymentRequest);
+        final String result = underTest.retrievePartnerTransactionId(paymentRequest.getContractConfiguration(),paymentRequest.getTransactionId(),paymentRequest.getOrder());
 
         assertEquals(partnerTransactionId, result);
     }
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.doReturn;
         paymentRequest.getContractConfiguration().getContractProperties()
                 .put(ContractConfigurationKeys.PARTNER_TRANSACTION_ID, new ContractProperty(PartnerTransactionIdOptions.ORDER_REFERENCE.name()));
 
-        final String result = underTest.retrievePartnerTransactionId(paymentRequest);
+        final String result = underTest.retrievePartnerTransactionId(paymentRequest.getContractConfiguration(),paymentRequest.getTransactionId(),paymentRequest.getOrder());
 
         assertEquals(paymentRequest.getOrder().getReference(), result);
     }
@@ -61,11 +61,11 @@ import static org.mockito.Mockito.doReturn;
 
         doReturn(LocalDateTime.of(2020, 12, 13, 14, 15, 16)).when(underTest).currentDateTime();
 
-        final String partnerTransactionId = underTest.computeEdelPartnerTransactionId(paymentRequest);
+        final String partnerTransactionId = underTest.computeEdelPartnerTransactionId(paymentRequest.getContractConfiguration(),paymentRequest.getTransactionId());
 
-        assertEquals("W000CAFE03039140ED80032ED93CE20C", partnerTransactionId);
+        assertEquals("W000CAFE030390F3E5B0032ED93CE20C", partnerTransactionId);
 
-        // W 000CAFE 03039 140ED8 003 2ED93CE20C
+        // W 000CAFE 03039 0F3E5B 003 2ED93CE20C
 
         final Long expectedTID = Long.parseLong(transactionIdDecimal.substring(transactionIdDecimal.length() - 7));
         final String tidSubstring = partnerTransactionId.substring(1, 8);
@@ -77,9 +77,9 @@ import static org.mockito.Mockito.doReturn;
         assertEquals( "03039",merchantBankCodeSubstring);
         assertEquals(expectedMerchantBankCode, hexToDec(merchantBankCodeSubstring));
 
-        final Long expectedContractCode = 1314520L;
+        final Long expectedContractCode = 999003L;
         final String contractCodeSubstring = partnerTransactionId.substring(13, 19);
-        assertEquals( "140ED8",contractCodeSubstring);
+        assertEquals( "0F3E5B",contractCodeSubstring);
         assertEquals(expectedContractCode, hexToDec(contractCodeSubstring));
 
         final String terminalSubstring = partnerTransactionId.substring(19, 22);

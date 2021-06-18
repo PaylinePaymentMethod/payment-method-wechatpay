@@ -19,7 +19,7 @@ class PaymentFormConfigurationServiceImplTest {
         Assertions.assertEquals(PaymentFormConfigurationResponseSpecific.class, response.getClass());
         PaymentFormConfigurationResponseSpecific responseSpecific = (PaymentFormConfigurationResponseSpecific) response;
         Assertions.assertTrue(responseSpecific.getPaymentForm().isDisplayButton());
-        Assertions.assertEquals("???fr_FR.form.button.text???", responseSpecific.getPaymentForm().getButtonText());
-        Assertions.assertEquals("???fr_FR.form.button.description???", responseSpecific.getPaymentForm().getDescription());
+        Assertions.assertEquals("Payer avec WeChat Pay", responseSpecific.getPaymentForm().getButtonText());
+        Assertions.assertEquals("Payer avec WeChat Pay", responseSpecific.getPaymentForm().getDescription());
     }
 }

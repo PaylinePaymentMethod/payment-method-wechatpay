@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
     private UnifiedOrderRequest buildUnifiedOrderRequest(final PaymentRequest paymentRequest, final RequestConfiguration configuration) {
         return UnifiedOrderRequest.builder()
                 .body(paymentRequest.getSoftDescriptor())
-                .outTradeNo(partnerTransactionIdService.retrievePartnerTransactionId(paymentRequest))
+                .outTradeNo(partnerTransactionIdService.retrievePartnerTransactionId(paymentRequest.getContractConfiguration(),paymentRequest.getTransactionId(),paymentRequest.getOrder()))
                 .deviceInfo(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.DEVICE_INFO))
                 .feeType(paymentRequest.getAmount().getCurrency().getCurrencyCode())
                 .totalFee(paymentRequest.getAmount().getAmountInSmallestUnit().toString())

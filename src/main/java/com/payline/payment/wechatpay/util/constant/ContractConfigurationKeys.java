@@ -10,4 +10,6 @@ public class ContractConfigurationKeys {
     public static final String PARTNER_TRANSACTION_ID = "partnerTransactionId";
     public static final String MERCHANT_BANK_CODE = "merchantBankCode";
     public static final String SECONDARY_MERCHANT_ID = "secondaryMerchantId";
+    public static final String NUM_CONTRACT_WECHAT = "numContractWechat";
+    public static final String TERMINAL_NUMBER = "terminalNumber";
 }

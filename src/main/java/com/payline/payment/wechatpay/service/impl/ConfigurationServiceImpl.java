@@ -45,6 +45,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         // sub merchant id
         parameters.add(buildInputParameter(ContractConfigurationKeys.SUB_MERCHANT_ID, true, locale));
+        // MERCHANT BANK CODE
+        parameters.add(buildInputParameter(ContractConfigurationKeys.MERCHANT_BANK_CODE, true, locale));
+        // NUM CONTRACT WECHAT
+        parameters.add(buildInputParameter(ContractConfigurationKeys.NUM_CONTRACT_WECHAT, true, locale));
 
         final ListBoxParameter partnerTransactionIdListBoxParameter = new ListBoxParameter();
         partnerTransactionIdListBoxParameter.setKey(ContractConfigurationKeys.PARTNER_TRANSACTION_ID);
@@ -57,6 +61,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         partnerTransactionIdListBoxParameter.setList(partnerTransactionIdMap);
         partnerTransactionIdListBoxParameter.setRequired(true);
         parameters.add(partnerTransactionIdListBoxParameter);
+        // TERMINAL NUMBER
+        parameters.add(buildInputParameter(ContractConfigurationKeys.TERMINAL_NUMBER, true, locale));
         return parameters;
     }
 

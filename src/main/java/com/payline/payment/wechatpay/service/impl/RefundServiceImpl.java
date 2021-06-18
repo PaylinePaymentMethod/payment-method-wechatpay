@@ -10,6 +10,7 @@ import com.payline.payment.wechatpay.bean.response.QueryRefundResponse;
 import com.payline.payment.wechatpay.bean.response.SubmitRefundResponse;
 import com.payline.payment.wechatpay.exception.PluginException;
 import com.payline.payment.wechatpay.service.HttpService;
+import com.payline.payment.wechatpay.service.PartnerTransactionIdService;
 import com.payline.payment.wechatpay.service.RequestConfigurationService;
 import com.payline.payment.wechatpay.util.PluginUtils;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
@@ -25,6 +26,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class RefundServiceImpl implements RefundService {
     HttpService httpService = HttpService.getInstance();
+    private PartnerTransactionIdService partnerTransactionIdService = PartnerTransactionIdService.getInstance();
 
     @Override
     public RefundResponse refundRequest(RefundRequest refundRequest) {
@@ -42,9 +44,8 @@ public class RefundServiceImpl implements RefundService {
                     .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                     .nonceStr(PluginUtils.generateRandomString(32))
                     .signType(SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE)).getType())
-
                     .transactionId(refundRequest.getPartnerTransactionId())
-                    .outTradeNo(refundRequest.getTransactionId())
+                    .outRefundNo(partnerTransactionIdService.retrievePartnerTransactionId(refundRequest.getContractConfiguration(),refundRequest.getTransactionId(),refundRequest.getOrder()))
                     .totalFee(refundRequest.getAmount().getAmountInSmallestUnit().toString())
                     .refundFee(refundRequest.getAmount().getAmountInSmallestUnit().toString())
                     .refundFeeType(refundRequest.getAmount().getCurrency().getCurrencyCode())
