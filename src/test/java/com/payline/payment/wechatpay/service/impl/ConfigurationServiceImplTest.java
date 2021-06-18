@@ -59,7 +59,7 @@ class ConfigurationServiceImplTest {
     void getParameters(Locale locale) {
         List<AbstractParameter> parameters = service.getParameters(locale);
 
-        assertEquals(3, parameters.size());
+        assertEquals(6, parameters.size());
 
         for (AbstractParameter p : parameters) {
             // each parameter should have a label and a description

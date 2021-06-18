@@ -111,9 +111,7 @@ public class HttpService {
             // get needed data
             String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
 
-            client.init(configuration);
-
-            URI uri = new URI(configuration
+            final URI uri = new URI(configuration
                     .getPartnerConfiguration()
                     .getProperty(PartnerConfigurationKeys.SUBMIT_REFUND_URL)
             );
@@ -142,7 +140,7 @@ public class HttpService {
             // get needed data
             String key = configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.KEY);
 
-            URI uri = new URI(configuration
+            final URI uri = new URI(configuration
                     .getPartnerConfiguration()
                     .getProperty(PartnerConfigurationKeys.QUERY_REFUND_URL)
             );

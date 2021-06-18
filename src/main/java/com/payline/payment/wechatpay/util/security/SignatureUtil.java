@@ -55,6 +55,7 @@ public class SignatureUtil {
         }
 
         if (!data.containsKey(FIELD_SIGN)) {
+            log.error("FIELD_SIGN is missing for WECHATPAY response");
             return false;
         }
         String sign = data.get(FIELD_SIGN);
@@ -149,7 +150,7 @@ public class SignatureUtil {
 
         try {
             MessageDigest md = MessageDigest.getInstance(MD5);
-            md.update(data.getBytes());
+            md.update(data.getBytes(StandardCharsets.UTF_8));
             byte[] digest = md.digest();
             return Hex.encodeHexString(digest).toUpperCase();
 

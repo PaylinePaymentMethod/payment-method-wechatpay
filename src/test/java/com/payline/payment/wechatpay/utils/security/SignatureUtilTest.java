@@ -8,9 +8,17 @@ import com.payline.payment.wechatpay.util.security.SignatureUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SignatureUtilTest {
@@ -45,23 +53,27 @@ class SignatureUtilTest {
         Assertions.assertTrue(utils.isSignatureValid(respData, "key", SignType.MD5.getType()));
     }
     @Test
-    void generateSignedXml_HMACSHA256(){
+    void generateSignedXml_HMACSHA256() throws URISyntaxException, IOException {
+        Path resourcePath = Paths.get(this.getClass().getResource("/generateSignedXml_HMACSHA256.xml").toURI());
+        String expectedXml = new String(Files.readAllBytes(resourcePath), "UTF8");
         Map<String, String> data = converter.objectToMap(MockUtils.aHMACSHA256Response());
         String key = "key";
         SignType signType = SignType.HMACSHA256;
 
         String signedXml = utils.generateSignedXml(data, key, signType.getType());
-        Assertions.assertEquals(MockUtils.aHMACSHA256SignedXml(), signedXml);
+        Assertions.assertEquals(expectedXml, signedXml);
     }
     @Test
-    void generateSignedXml_MD5(){
+    void generateSignedXml_MD5() throws URISyntaxException, IOException {
+        Path resourcePath = Paths.get(this.getClass().getResource("/generateSignedXml_MD5.xml").toURI());
+        String expectedXml = new String(Files.readAllBytes(resourcePath), "UTF8");
         Map<String, String> data = converter.objectToMap(MockUtils.aMD5Response());
         String key = "key";
         SignType signType = SignType.MD5;
 
         String signedXml = utils.generateSignedXml(data, key, signType.getType());
 
-        Assertions.assertEquals(MockUtils.aMD5SignedXml(), signedXml);
+        Assertions.assertEquals(expectedXml, signedXml);
     }
     @Test
     void generateSignedXml_NullKey(){
@@ -94,5 +106,13 @@ class SignatureUtilTest {
     @Test
     void hashWithMD5_Null(){
         assertThrows(PluginException.class, () -> utils.hashWithMD5(null));
+    }
+
+    @Test
+    void hashWithMD5(){
+        String rawString = "appid=wxa5b511bc130a4d9e&device_info=WEB&err_code=INVALID_REQUEST&err_code_des=201 商户订单号重复&" +
+                "mch_id=110605603&nonce_str=zg9vizP9FSWKP9ku&result_code=FAIL&return_code=SUCCESS&return_msg=OK&" +
+                "sub_mch_id=345923236&key=2ab9071b06b9f739b950ddb41db2690d";
+        assertEquals("E06AFA945146A138D7F7C3CF4C13234F", utils.hashWithMD5(rawString));
     }
 }

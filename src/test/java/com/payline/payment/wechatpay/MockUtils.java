@@ -76,6 +76,8 @@ public class MockUtils {
         contractProperties.put(ContractConfigurationKeys.SECONDARY_MERCHANT_ID, new ContractProperty("1314520"));
         contractProperties.put(ContractConfigurationKeys.MERCHANT_BANK_CODE, new ContractProperty("12345"));
         contractProperties.put(ContractConfigurationKeys.PARTNER_TRANSACTION_ID, new ContractProperty(PartnerTransactionIdOptions.ORDER_REFERENCE.name()));
+        contractProperties.put(ContractConfigurationKeys.TERMINAL_NUMBER, new ContractProperty("003"));
+        contractProperties.put(ContractConfigurationKeys.NUM_CONTRACT_WECHAT, new ContractProperty("999003"));
 
 
         return new ContractConfiguration("WeChatPay", contractProperties);
@@ -88,7 +90,6 @@ public class MockUtils {
         Map<String, String> partnerConfigurationMap = new HashMap<>();
 
         partnerConfigurationMap.put(PartnerConfigurationKeys.APPID, "123456789");
-        partnerConfigurationMap.put(PartnerConfigurationKeys.CERTIFICATE, "Certificat");
         partnerConfigurationMap.put(PartnerConfigurationKeys.DEVICE_INFO, "WEB");
         partnerConfigurationMap.put(PartnerConfigurationKeys.QUERY_ORDER_URL, "https://api.mch.weixin.qq.com/pay/orderquery");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SUBMIT_REFUND_URL, "https://api.mch.weixin.qq.com/secapi/pay/refund");
@@ -98,7 +99,6 @@ public class MockUtils {
         partnerConfigurationMap.put(PartnerConfigurationKeys.KEY, "key");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SUB_APPID, "");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SIGN_TYPE, "MD5");
-        partnerConfigurationMap.put(PartnerConfigurationKeys.TERMINAL_NUMBER, "003");
 
         Map<String, String> sensitiveConfigurationMap = new HashMap<>();
 
@@ -211,40 +211,7 @@ public class MockUtils {
                 .subMerchantId("subMerchantId")
                 .build();
     }
-    public String aHMACSHA256SignedXml(){
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" +
-                "<xml>\r\n" +
-                "    <return_code>SUCCESS</return_code>\r\n" +
-                "    <return_msg>returnMessage</return_msg>\r\n" +
-                "    <result_code>SUCCESS</result_code>\r\n" +
-                "    <err_code>errorCode</err_code>\r\n" +
-                "    <err_code_des>errorCodeDescription</err_code_des>\r\n" +
-                "    <appid>appId</appid>\r\n" +
-                "    <mch_id>merchantId</mch_id>\r\n" +
-                "    <sub_appid>subAppId</sub_appid>\r\n" +
-                "    <sub_mch_id>subMerchantId</sub_mch_id>\r\n" +
-                "    <nonce_str>nonceStr</nonce_str>\r\n" +
-                "    <sign_type>HMAC-SHA256</sign_type>\r\n" +
-                "    <sign>413437B51D1A196D92B015946FF20B3D77D48A81A55559CAE9AE029B54F61CAB</sign>\r\n" +
-                "</xml>\r\n";
-    }
-    public String aMD5SignedXml(){
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n" +
-                "<xml>\r\n" +
-                "    <return_code>SUCCESS</return_code>\r\n" +
-                "    <return_msg>returnMessage</return_msg>\r\n" +
-                "    <result_code>SUCCESS</result_code>\r\n" +
-                "    <err_code>errorCode</err_code>\r\n" +
-                "    <err_code_des>errorCodeDescription</err_code_des>\r\n" +
-                "    <appid>appId</appid>\r\n" +
-                "    <mch_id>merchantId</mch_id>\r\n" +
-                "    <sub_appid>subAppId</sub_appid>\r\n" +
-                "    <sub_mch_id>subMerchantId</sub_mch_id>\r\n" +
-                "    <nonce_str>nonceStr</nonce_str>\r\n" +
-                "    <sign_type>MD5</sign_type>\r\n" +
-                "    <sign>C4C4063BA822FC13EA0778CC700849A8</sign>\r\n" +
-                "</xml>\r\n";
-    }
+
     public String aQueryRefundResponseXml(){
         return "<xml>\n" +
                 "<appid><![CDATA[wxa5b511bc130a4d9e]]></appid>\n" +

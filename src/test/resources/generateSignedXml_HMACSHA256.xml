@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xml>
+    <return_code>SUCCESS</return_code>
+    <return_msg>returnMessage</return_msg>
+    <result_code>SUCCESS</result_code>
+    <err_code>errorCode</err_code>
+    <err_code_des>errorCodeDescription</err_code_des>
+    <appid>appId</appid>
+    <mch_id>merchantId</mch_id>
+    <sub_appid>subAppId</sub_appid>
+    <sub_mch_id>subMerchantId</sub_mch_id>
+    <nonce_str>nonceStr</nonce_str>
+    <sign_type>HMAC-SHA256</sign_type>
+    <sign>413437B51D1A196D92B015946FF20B3D77D48A81A55559CAE9AE029B54F61CAB</sign>
+</xml>

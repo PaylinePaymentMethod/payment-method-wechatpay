@@ -1,13 +1,11 @@
 package com.payline.payment.wechatpay.service;
 
 import com.payline.payment.wechatpay.enumeration.PartnerTransactionIdOptions;
-import com.payline.payment.wechatpay.exception.PluginException;
 import com.payline.payment.wechatpay.util.PluginUtils;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
-import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.ContractProperty;
-import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import com.payline.pmapi.bean.payment.Order;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,34 +28,28 @@ public class PartnerTransactionIdService {
         return PartnerTransactionIdService.Holder.INSTANCE;
     }
 
-    public String retrievePartnerTransactionId(final PaymentRequest paymentRequest) {
+    public String retrievePartnerTransactionId(final ContractConfiguration contractConfiguration, final String transactionId, final Order order) {
         final String partnerTransactionId;
-        final ContractProperty contractProperty = paymentRequest.getContractConfiguration().getProperty(ContractConfigurationKeys.PARTNER_TRANSACTION_ID);
+        final ContractProperty contractProperty = contractConfiguration.getProperty(ContractConfigurationKeys.PARTNER_TRANSACTION_ID);
         if (contractProperty != null && PartnerTransactionIdOptions.EDEL.name().equals(contractProperty.getValue())) {
-            partnerTransactionId = computeEdelPartnerTransactionId(paymentRequest);
+            partnerTransactionId = computeEdelPartnerTransactionId(contractConfiguration,transactionId);
         } else {
-            partnerTransactionId = paymentRequest.getOrder().getReference();
+            partnerTransactionId = order.getReference();
         }
 
         return partnerTransactionId;
     }
 
-    protected String computeEdelPartnerTransactionId(final PaymentRequest paymentRequest) {
 
-        final String terminalNumber = paymentRequest.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.TERMINAL_NUMBER);
-        if (terminalNumber == null) {
-            throw new PluginException(PartnerConfigurationKeys.TERMINAL_NUMBER + " is missing in the PartnerConfiguration");
-        }
+    protected String computeEdelPartnerTransactionId(final ContractConfiguration contractConfiguration, final String transactionId ) {
 
-        final ContractConfiguration contractConfiguration = paymentRequest.getContractConfiguration();
-        final String terminalNumberHex = decimalToHex(terminalNumber);
-
-        final String edelTransactionNumberDecimal = paymentRequest.getTransactionId().substring(paymentRequest.getTransactionId().length() - EDEL_TRANSACTION_NUMBER_SIZE);
+        final String terminalNumberHex = decimalToHex(contractConfiguration.getProperty(ContractConfigurationKeys.TERMINAL_NUMBER).getValue());
+        final String edelTransactionNumberDecimal = transactionId.substring(transactionId.length() - EDEL_TRANSACTION_NUMBER_SIZE);
         final String edelTransactionNumberHex = decimalToHex(edelTransactionNumberDecimal);
 
         final String bankCodeHex = decimalToHex(contractConfiguration.getProperty(ContractConfigurationKeys.MERCHANT_BANK_CODE).getValue());
 
-        final String contractNumberHex = decimalToHex(contractConfiguration.getProperty(ContractConfigurationKeys.SECONDARY_MERCHANT_ID).getValue());
+        final String contractNumberHex = decimalToHex(contractConfiguration.getProperty(ContractConfigurationKeys.NUM_CONTRACT_WECHAT).getValue());
 
         final String dateTimeHex = decimalToHex(currentDateTime().format(DateTimeFormatter.ofPattern(EDEL_DATE_TIME_PATTERN)));
 
