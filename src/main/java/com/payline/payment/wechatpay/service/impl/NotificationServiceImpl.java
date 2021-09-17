@@ -3,6 +3,7 @@ package com.payline.payment.wechatpay.service.impl;
 import com.payline.payment.wechatpay.bean.configuration.RequestConfiguration;
 import com.payline.payment.wechatpay.bean.nested.SignType;
 import com.payline.payment.wechatpay.bean.nested.TradeState;
+import com.payline.payment.wechatpay.bean.pmapi.TransactionAdditionalData;
 import com.payline.payment.wechatpay.bean.request.QueryOrderRequest;
 import com.payline.payment.wechatpay.bean.response.NotificationMessage;
 import com.payline.payment.wechatpay.bean.response.QueryOrderResponse;
@@ -77,15 +78,17 @@ public class NotificationServiceImpl implements NotificationService {
 
             // check transaction status
             TradeState tradeState = queryOrderResponse.getTradeState();
-            partnerTransactionId = queryOrderResponse.getTransactionId();
+            partnerTransactionId = queryOrderResponse.getOutTradNo();
             BuyerPaymentId buyerPaymentId = new EmptyTransactionDetails();
-
+            // Build transaction additional data
+            final TransactionAdditionalData transactionAdditionalData = new TransactionAdditionalData(queryOrderResponse.getTransactionId());
             if (tradeState == TradeState.SUCCESS) {
                 paymentResponse = PaymentResponseSuccess.PaymentResponseSuccessBuilder
                         .aPaymentResponseSuccess()
                         .withPartnerTransactionId(partnerTransactionId)
                         .withStatusCode(tradeState.name())
                         .withTransactionDetails(buyerPaymentId)
+                        .withTransactionAdditionalData(transactionAdditionalData.getTransactionId())
                         .build();
             } else {
                 paymentResponse = PaymentResponseFailure.PaymentResponseFailureBuilder
@@ -94,6 +97,7 @@ public class NotificationServiceImpl implements NotificationService {
                         .withErrorCode(queryOrderResponse.getErrorCode())
                         .withFailureCause(FailureCause.PARTNER_UNKNOWN_ERROR)
                         .withTransactionDetails(buyerPaymentId)
+                        .withTransactionAdditionalData(transactionAdditionalData.getTransactionId())
                         .build();
             }
         } catch (PluginException e) {

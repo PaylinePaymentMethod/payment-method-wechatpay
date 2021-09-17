@@ -44,7 +44,7 @@ public class RefundServiceImpl implements RefundService {
                     .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                     .nonceStr(PluginUtils.generateRandomString(32))
                     .signType(SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE)).getType())
-                    .transactionId(refundRequest.getPartnerTransactionId())
+                    .transactionId(refundRequest.getTransactionAdditionalData())
                     .outRefundNo(partnerTransactionIdService.retrievePartnerTransactionId(refundRequest.getContractConfiguration(),refundRequest.getTransactionId(),refundRequest.getOrder()))
                     .totalFee(refundRequest.getAmount().getAmountInSmallestUnit().toString())
                     .refundFee(refundRequest.getAmount().getAmountInSmallestUnit().toString())
