@@ -35,4 +35,11 @@ public class UnifiedOrderRequest extends WeChatPayBean {
     TradeType tradeType;
 
     @SerializedName("product_id") String productId;
+
+    /**
+     * The wechat pay transaction expires at this date.
+     * Format is yyyyMMddHHmmss and time zone is UTC+8 (China Standard Time)
+     */
+    @SerializedName("time_expire")
+    String dateTimeExpire;
 }
