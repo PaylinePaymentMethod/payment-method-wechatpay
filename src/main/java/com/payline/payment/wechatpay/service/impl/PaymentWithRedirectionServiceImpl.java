@@ -135,20 +135,19 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
     public PaymentResponse getPaymentStatus(TransactionStatusRequest request, RequestConfiguration configuration){
     PaymentResponse paymentResponse;
 
+        final String partnerTransactionId = request.getTransactionId();
         QueryOrderRequest queryOrderRequest = QueryOrderRequest.builder()
                 .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
                 .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
                 .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
                 .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
-                .deviceInfo(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.DEVICE_INFO))
-                .transactionId(request.getTransactionId())
+                .outTradeNo(partnerTransactionId)
                 .nonceStr(PluginUtils.generateRandomString(32))
                 .signType(SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE)).getType())
                 .build();
 
         QueryOrderResponse response = httpService.queryOrder(configuration, queryOrderRequest);
 
-        String partnerTransactionId = response.getTransactionId();
         BuyerPaymentId buyerPaymentId = new EmptyTransactionDetails();
         TradeState tradeState = response.getTradeState();
         switch (tradeState) {
