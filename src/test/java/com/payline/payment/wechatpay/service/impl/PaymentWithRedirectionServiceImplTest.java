@@ -126,15 +126,15 @@ class PaymentWithRedirectionServiceImplTest {
                 .subAppId("subAppId")
                 .subMerchantId("subMerchantId")
                 .tradeState(TradeState.SUCCESS)
-                .transactionId("transactionId")
                 .build();
 
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
+        final TransactionStatusRequest transactionStatusRequest = aPaylineTransactionStatusRequest();
 
-        PaymentResponse response = service.handleSessionExpired(MockUtils.aPaylineTransactionStatusRequest());
+        PaymentResponse response = service.handleSessionExpired(transactionStatusRequest);
 
         Assertions.assertEquals(PaymentResponseSuccess.class, response.getClass());
-        Assertions.assertEquals(queryOrderResponse.getTransactionId(), ((PaymentResponseSuccess) response).getPartnerTransactionId());
+        Assertions.assertEquals(transactionStatusRequest.getTransactionId(), ((PaymentResponseSuccess) response).getPartnerTransactionId());
         Assertions.assertEquals(queryOrderResponse.getTradeState().name(), ((PaymentResponseSuccess) response).getStatusCode());
     }
 
@@ -154,15 +154,15 @@ class PaymentWithRedirectionServiceImplTest {
                 .subAppId("subAppId")
                 .subMerchantId("subMerchantId")
                 .tradeState(TradeState.NOTPAY)
-                .transactionId("transactionId")
                 .build();
 
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
+        final TransactionStatusRequest transactionStatusRequest = aPaylineTransactionStatusRequest();
 
-        PaymentResponse response = service.handleSessionExpired(MockUtils.aPaylineTransactionStatusRequest());
+        PaymentResponse response = service.handleSessionExpired(transactionStatusRequest);
 
         Assertions.assertEquals(PaymentResponseFailure.class, response.getClass());
-        Assertions.assertEquals(queryOrderResponse.getTransactionId(), ((PaymentResponseFailure) response).getPartnerTransactionId());
+        Assertions.assertEquals(transactionStatusRequest.getTransactionId(), ((PaymentResponseFailure) response).getPartnerTransactionId());
         Assertions.assertEquals(queryOrderResponse.getErrorCode(), ((PaymentResponseFailure) response).getErrorCode());
         Assertions.assertEquals(FailureCause.CANCEL, ((PaymentResponseFailure) response).getFailureCause());
     }
@@ -183,15 +183,15 @@ class PaymentWithRedirectionServiceImplTest {
                 .subAppId("subAppId")
                 .subMerchantId("subMerchantId")
                 .tradeState(TradeState.REFUND)
-                .transactionId("transactionId")
                 .build();
 
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
+        final TransactionStatusRequest transactionStatusRequest = aPaylineTransactionStatusRequest();
 
-        PaymentResponse response = service.handleSessionExpired(MockUtils.aPaylineTransactionStatusRequest());
+        PaymentResponse response = service.handleSessionExpired(transactionStatusRequest);
 
         Assertions.assertEquals(PaymentResponseFailure.class, response.getClass());
-        Assertions.assertEquals(queryOrderResponse.getTransactionId(), ((PaymentResponseFailure) response).getPartnerTransactionId());
+        Assertions.assertEquals(transactionStatusRequest.getTransactionId(), ((PaymentResponseFailure) response).getPartnerTransactionId());
         Assertions.assertEquals(queryOrderResponse.getErrorCode(), ((PaymentResponseFailure) response).getErrorCode());
         Assertions.assertEquals(FailureCause.INVALID_DATA, ((PaymentResponseFailure) response).getFailureCause());
     }

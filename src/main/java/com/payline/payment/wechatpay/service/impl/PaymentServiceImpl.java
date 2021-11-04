@@ -14,12 +14,18 @@ import com.payline.payment.wechatpay.util.PluginUtils;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
 import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.pmapi.bean.common.FailureCause;
+import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseActiveWaiting;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
 import com.payline.pmapi.service.PaymentService;
 import lombok.extern.log4j.Log4j2;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Log4j2
 public class PaymentServiceImpl implements PaymentService {
@@ -48,6 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentResponse = PaymentResponseActiveWaiting.builder()
                     .image(image)
                     .contentType("image/" + QRCodeService.IMAGE_FORMAT)
+                    .partnerTransactionId(request.getOutTradeNo())
                     .build();
         } catch (final PluginException e) {
             log.info("a PluginException occurred", e);
@@ -81,6 +88,21 @@ public class PaymentServiceImpl implements PaymentService {
                 .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
                 .nonceStr(PluginUtils.generateRandomString(32))
                 .signType(SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE)).getType())
+                .dateTimeExpire(computeChinaDateTime(configuration.getPartnerConfiguration()))
                 .build();
+    }
+
+    /**
+     * Calcule la date et l'heure de fin de validité de la transaction côté wechat en se basant sur la durée de l'active waiting et en
+     * convertissant en heure chinoise utc+8
+     * @param partnerConfiguration les partner configurations contenant la durée de l'active waiting
+     * @return la date et heure de fin de la transaction wechat à l'heure chinoise utc+8
+     */
+    protected String computeChinaDateTime(final PartnerConfiguration partnerConfiguration) {
+        final long activeWaitingTimeout = Long.parseLong(partnerConfiguration.getProperty(PartnerConfigurationKeys.ACTIVE_WAITING_TIMEOUT));
+        final LocalDateTime localDateTime = LocalDateTime.now().plusSeconds(activeWaitingTimeout);
+        final ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Europe/Paris"));
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        return zonedDateTime.withZoneSameInstant(ZoneId.of("PRC")).format(formatter);
     }
 }

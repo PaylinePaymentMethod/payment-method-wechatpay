@@ -10,6 +10,7 @@ public class PartnerConfigurationKeys {
     public static final String SUBMIT_REFUND_URL = "submitRefundUrl";
     public static final String QUERY_REFUND_URL = "queryRefundUrl";
     public static final String DOWNLOAD_TRANSACTIONS_URL = "downloadTransactionsUrl";
+    public static final String ACTIVE_WAITING_TIMEOUT = "activeWaitingTimeout";
 
     public static final String KEY = "key";
     public static final String APPID = "appId";

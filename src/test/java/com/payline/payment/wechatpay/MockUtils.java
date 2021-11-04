@@ -96,6 +96,7 @@ public class MockUtils {
         partnerConfigurationMap.put(PartnerConfigurationKeys.UNIFIED_ORDER_URL, "https://api.mch.weixin.qq.com/pay/unifiedorder");
         partnerConfigurationMap.put(PartnerConfigurationKeys.QUERY_REFUND_URL, "https://api.mch.weixin.qq.com/pay/queryrefund");
         partnerConfigurationMap.put(PartnerConfigurationKeys.DOWNLOAD_TRANSACTIONS_URL, "https://api.mch.weixin.qq.com/pay/downloadbill");
+        partnerConfigurationMap.put(PartnerConfigurationKeys.ACTIVE_WAITING_TIMEOUT, "600");
         partnerConfigurationMap.put(PartnerConfigurationKeys.KEY, "key");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SUB_APPID, "");
         partnerConfigurationMap.put(PartnerConfigurationKeys.SIGN_TYPE, "MD5");
@@ -255,6 +256,7 @@ public class MockUtils {
                 .withContractConfiguration(aContractConfiguration())
                 .withEnvironment(anEnvironment())
                 .withTransactionId(TRANSACTION_ID)
+                .withTotalRefundedAmount(aPaylineAmount())
                 .withPartnerTransactionId(PARTNER_TRANSACTION_ID)
                 .withPartnerConfiguration(aPartnerConfiguration());
     }

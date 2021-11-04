@@ -106,6 +106,7 @@ class NotificationServiceImplTest {
                 .resultCode(Code.SUCCESS)
                 .tradeState(TradeState.SUCCESS)
                 .transactionId("123456")
+                .outTradNo("W02A38370335D0F3E5B003311BA3BEKK")
                 .build();
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
 
@@ -123,7 +124,8 @@ class NotificationServiceImplTest {
 
         assertEquals(PaymentResponseSuccess.class, paymentResponse.getClass());
         PaymentResponseSuccess responseSuccess = (PaymentResponseSuccess) paymentResponse;
-        assertEquals("123456", responseSuccess.getPartnerTransactionId());
+        assertEquals("W02A38370335D0F3E5B003311BA3BEKK", responseSuccess.getPartnerTransactionId());
+        assertEquals("123456", responseSuccess.getTransactionAdditionalData());
         assertEquals("SUCCESS", responseSuccess.getStatusCode());
         assertEquals(EmptyTransactionDetails.class, responseSuccess.getTransactionDetails().getClass());
 
@@ -163,6 +165,7 @@ class NotificationServiceImplTest {
                 .tradeState(TradeState.NOTPAY)
                 .errorCode("an error code")
                 .transactionId("123456")
+                .outTradNo("W02A38370335D0F3E5B003311BA3BEKK")
                 .build();
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
 
@@ -180,7 +183,8 @@ class NotificationServiceImplTest {
 
         assertEquals(PaymentResponseFailure.class, paymentResponse.getClass());
         PaymentResponseFailure paymentResponseFailure = (PaymentResponseFailure) paymentResponse;
-        assertEquals("123456", paymentResponseFailure.getPartnerTransactionId());
+        assertEquals("W02A38370335D0F3E5B003311BA3BEKK", paymentResponseFailure.getPartnerTransactionId());
+        assertEquals("123456", paymentResponseFailure.getTransactionAdditionalData());
         assertEquals("an error code", paymentResponseFailure.getErrorCode());
         assertEquals(FailureCause.PARTNER_UNKNOWN_ERROR, paymentResponseFailure.getFailureCause());
         assertEquals(EmptyTransactionDetails.class, paymentResponseFailure.getTransactionDetails().getClass());
@@ -221,6 +225,7 @@ class NotificationServiceImplTest {
                 .resultCode(Code.SUCCESS)
                 .tradeState(TradeState.SUCCESS)
                 .transactionId("123456")
+                .outTradNo("W02A38370335D0F3E5B003311BA3BEKK")
                 .build();
         Mockito.doReturn(queryOrderResponse).when(httpService).queryOrder(any(), any());
 
@@ -238,7 +243,8 @@ class NotificationServiceImplTest {
 
         assertEquals(PaymentResponseSuccess.class, paymentResponse.getClass());
         PaymentResponseSuccess responseSuccess = (PaymentResponseSuccess) paymentResponse;
-        assertEquals("123456", responseSuccess.getPartnerTransactionId());
+        assertEquals("W02A38370335D0F3E5B003311BA3BEKK", responseSuccess.getPartnerTransactionId());
+        assertEquals("123456", responseSuccess.getTransactionAdditionalData());
         assertEquals("SUCCESS", responseSuccess.getStatusCode());
         assertEquals(EmptyTransactionDetails.class, responseSuccess.getTransactionDetails().getClass());
 
