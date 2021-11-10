@@ -1,10 +1,7 @@
 package com.payline.payment.wechatpay.service.impl;
 
 import com.payline.payment.wechatpay.MockUtils;
-import com.payline.payment.wechatpay.bean.nested.Code;
-import com.payline.payment.wechatpay.bean.response.Response;
-import com.payline.payment.wechatpay.exception.InvalidDataException;
-import com.payline.payment.wechatpay.service.HttpService;
+import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
 import com.payline.payment.wechatpay.util.properties.ReleaseProperties;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
@@ -16,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.text.SimpleDateFormat;
@@ -24,9 +20,7 @@ import java.time.Month;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest.GENERIC_ERROR;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 
@@ -37,9 +31,6 @@ class ConfigurationServiceImplTest {
 
     @Mock
     private ReleaseProperties releaseProperties;
-
-    @Mock
-    private HttpService httpService;
 
     @BeforeEach
     void setup() {
@@ -77,17 +68,6 @@ class ConfigurationServiceImplTest {
 
     @Test
     void checkNominal() {
-        Response response = Response.builder()
-                .appId("appId")
-                .merchantId("mchId")
-                .subMerchantId("subMchId")
-                .nonceStr("123")
-                .returnCode(Code.SUCCESS)
-                .resultCode(Code.FAIL)
-                .errorCode("20002")
-                .build();
-        doReturn(response).when(httpService).downloadTransactionHistory(any(), any());
-
         ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
         Map<String, String> errors = service.check(request);
 
@@ -96,47 +76,18 @@ class ConfigurationServiceImplTest {
 
     @Test
     void checkFail() {
-        Response response = Response.builder()
-                .appId("appId")
-                .merchantId("mchId")
-                .subMerchantId("subMchId")
-                .nonceStr("123")
-                .returnCode(Code.SUCCESS)
-                .returnMessage("foo")
-                .resultCode(Code.FAIL)
-                .errorCode("20003")
+        ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder()
+                .withAccountInfo(new HashMap<>())
                 .build();
-        doReturn(response).when(httpService).downloadTransactionHistory(any(), any());
-
-        ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
         Map<String, String> errors = service.check(request);
 
-        assertEquals(1, errors.size());
-        assertTrue( errors.containsKey(GENERIC_ERROR));
-        assertEquals("foo", errors.get(GENERIC_ERROR));
-    }
-
-
-    @Test
-    void checkPluginException(){
-        Mockito.doThrow(new InvalidDataException("foo")).when(httpService).downloadTransactionHistory(any(), any());
-
-        ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
-        Map<String, String> errors = service.check(request);
-
-        assertEquals(1, errors.size());
-        assertEquals("foo", errors.get(GENERIC_ERROR));
-    }
-
-    @Test
-    void checkRuntimeException(){
-        Mockito.doThrow(new NullPointerException("foo")).when(httpService).downloadTransactionHistory(any(), any());
-
-        ContractParametersCheckRequest request = MockUtils.aContractParametersCheckRequestBuilder().build();
-        Map<String, String> errors = service.check(request);
-
-        assertEquals(1, errors.size());
-        assertEquals("foo", errors.get(GENERIC_ERROR));
+        assertEquals(6, errors.size());
+        assertTrue(errors.containsKey(ContractConfigurationKeys.MERCHANT_ID));
+        assertTrue(errors.containsKey(ContractConfigurationKeys.SUB_MERCHANT_ID));
+        assertTrue(errors.containsKey(ContractConfigurationKeys.MERCHANT_BANK_CODE));
+        assertTrue(errors.containsKey(ContractConfigurationKeys.NUM_CONTRACT_WECHAT));
+        assertTrue(errors.containsKey(ContractConfigurationKeys.PARTNER_TRANSACTION_ID));
+        assertTrue(errors.containsKey(ContractConfigurationKeys.TERMINAL_NUMBER));
     }
 
     @Test
