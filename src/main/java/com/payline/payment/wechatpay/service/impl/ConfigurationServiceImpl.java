@@ -1,17 +1,8 @@
 package com.payline.payment.wechatpay.service.impl;
 
-import com.payline.payment.wechatpay.bean.configuration.RequestConfiguration;
-import com.payline.payment.wechatpay.bean.nested.Code;
-import com.payline.payment.wechatpay.bean.nested.SignType;
-import com.payline.payment.wechatpay.bean.request.DownloadTransactionHistoryRequest;
-import com.payline.payment.wechatpay.bean.response.Response;
 import com.payline.payment.wechatpay.enumeration.PartnerTransactionIdOptions;
-import com.payline.payment.wechatpay.exception.PluginException;
-import com.payline.payment.wechatpay.service.HttpService;
-import com.payline.payment.wechatpay.service.RequestConfigurationService;
 import com.payline.payment.wechatpay.util.PluginUtils;
 import com.payline.payment.wechatpay.util.constant.ContractConfigurationKeys;
-import com.payline.payment.wechatpay.util.constant.PartnerConfigurationKeys;
 import com.payline.payment.wechatpay.util.i18n.I18nService;
 import com.payline.payment.wechatpay.util.properties.ReleaseProperties;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
@@ -26,11 +17,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest.GENERIC_ERROR;
-
 @Log4j2
 public class ConfigurationServiceImpl implements ConfigurationService {
-    private HttpService httpService = HttpService.getInstance();
     private ReleaseProperties releaseProperties = ReleaseProperties.getInstance();
     private final I18nService i18n = I18nService.getInstance();
 
@@ -69,32 +57,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public Map<String, String> check(ContractParametersCheckRequest contractParametersCheckRequest) {
         final Map<String, String> errors = new HashMap<>();
-        try {
-            // check il all mandatory fields are filled
-            Map<String, String> accountInfo = contractParametersCheckRequest.getAccountInfo();
-            Locale locale = contractParametersCheckRequest.getLocale();
+        // check il all mandatory fields are filled
+        Map<String, String> accountInfo = contractParametersCheckRequest.getAccountInfo();
+        Locale locale = contractParametersCheckRequest.getLocale();
 
-            // check required fields
-            for (AbstractParameter param : this.getParameters(locale)) {
-                if (param.isRequired() && accountInfo.get(param.getKey()) == null) {
-                    log.info("contract param: {} is mandatory but missing", param.getKey());
-                    String message = i18n.getMessage(I18N_CONTRACT_PREFIX + param.getKey() + ".requiredError", locale);
-                    errors.put(param.getKey(), message);
-                }
+        // check required fields
+        for (AbstractParameter param : this.getParameters(locale)) {
+            if (param.isRequired() && PluginUtils.isEmpty(accountInfo.get(param.getKey()))) {
+                log.info("contract param: {} is mandatory but missing", param.getKey());
+                String message = i18n.getMessage(I18N_CONTRACT_PREFIX + param.getKey() + ".requiredError", locale);
+                errors.put(param.getKey(), message);
             }
-
-            if (errors.isEmpty()) {
-                final String errorMessage = checkWechatPayParameters(contractParametersCheckRequest);
-                if (!PluginUtils.isEmpty(errorMessage)) {
-                    errors.put(GENERIC_ERROR, errorMessage);
-                }
-            }
-        } catch (PluginException e) {
-            log.info("a PluginException occurred", e);
-            errors.put(GENERIC_ERROR, e.getMessage());
-        } catch (RuntimeException e) {
-            log.error("Unexpected plugin error", e);
-            errors.put(GENERIC_ERROR, e.getMessage());
         }
 
         return errors;
@@ -128,34 +101,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         inputParameter.setDescription(i18n.getMessage(I18N_CONTRACT_PREFIX + key + ".description", locale));
         inputParameter.setRequired(required);
         return inputParameter;
-    }
-
-    private String checkWechatPayParameters(final ContractParametersCheckRequest contractParametersCheckRequest) {
-        final String errorMessage;
-        // call for a getCheckoutSession with a bad checkoutSession id
-        final RequestConfiguration configuration = RequestConfigurationService.getInstance().build(contractParametersCheckRequest);
-        // call WechatPay API
-        final DownloadTransactionHistoryRequest downloadTransactionHistoryRequest = DownloadTransactionHistoryRequest.builder()
-                .appId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.APPID))
-                .merchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.MERCHANT_ID).getValue())
-                .subAppId(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SUB_APPID))
-                .subMerchantId(configuration.getContractConfiguration().getProperty(ContractConfigurationKeys.SUB_MERCHANT_ID).getValue())
-                .nonceStr(PluginUtils.generateRandomString(32))
-                .signType(SignType.valueOf(configuration.getPartnerConfiguration().getProperty(PartnerConfigurationKeys.SIGN_TYPE)).getType())
-                .billDate(PluginUtils.createDate())
-                .billType("ALL")
-                .build();
-
-        final Response response = httpService.downloadTransactionHistory(configuration, downloadTransactionHistoryRequest);
-        // verify Response
-        final Code code = response.getResultCode();
-        final String errorCode = response.getErrorCode();
-        if (code.equals(Code.FAIL) && !errorCode.equals("20002")) {
-            errorMessage = response.getReturnMessage();
-        } else {
-            errorMessage = null;
-        }
-        return errorMessage;
     }
 
 }
